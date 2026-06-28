@@ -48,7 +48,8 @@
 
   <!-- GATE 2 approved -->
   <rect x="244" y="450" width="1164" height="180" rx="8" fill="#151a21" stroke="#2b3543"/>
-  <text x="262" y="480" class="h2">Connect Linear write access (mirror)</text>
+  <g transform="translate(270,474) rotate(-45)" fill="none" stroke="#aab4c0" stroke-width="2.4" stroke-linecap="round"><line x1="-7" y1="-5" x2="7" y2="-5"/><line x1="-8" y1="0" x2="8" y2="0"/><line x1="-7" y1="5" x2="7" y2="5"/></g>
+  <text x="286" y="480" class="h2">Connect Linear write access (mirror)</text>
   <rect x="560" y="464" width="220" height="20" rx="10" fill="rgba(70,201,128,0.14)"/><text x="568" y="478" fill="#46c980" font-size="11" font-weight="600">Approved (local-only · simulated)</text>
   <text x="262" y="510" class="muted">blast radius: MEDIUM · Linear is a Mirror/Courier — never the source of truth</text>
   <rect x="262" y="526" width="700" height="84" rx="6" fill="#1c232c" stroke="#2f4034"/>

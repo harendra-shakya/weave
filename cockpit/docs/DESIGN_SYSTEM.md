@@ -2,7 +2,7 @@
 
 > Deliverable for **[ATM-385](https://linear.app/atumera-llc/issue/ATM-385/weave-02-screen-map-wireframes-and-visual-design-for-local-owner)** (part 2 — visual design + component/status system).
 > Tokens live in [`../styles/tokens.css`](../styles/tokens.css) and are the single source of truth — this doc explains them and specs the components built on top.
-> Hi-fi mockups: [command-center-hifi.svg](assets/mockups/command-center-hifi.svg), [gates-hifi.svg](assets/mockups/gates-hifi.svg).
+> Hi-fi mockups: [command-center-hifi.svg](assets/mockups/command-center-hifi.svg), [gates-hifi.svg](assets/mockups/gates-hifi.svg). Icon set: [icon-set.svg](assets/icons/icon-set.svg).
 
 ---
 
@@ -100,11 +100,14 @@ The three non-populated states every data screen needs (per-screen copy is speci
 - **Empty / loading / error:** see §5.10 — empty = muted single line + route hint; loading = layout-matched skeleton (no spinner); error = neutral panel pointing to Settings, never status-colored, never leaking paths/secrets.
 - **Density:** default compact; one width (desktop, ≥1280). No mobile in MVP scope.
 
-## 6a. Iconography & asset policy
-Source/tool identities (WEAVE, Linear, Slack, GitHub, and the runtimes Codex / Claude / Local runtime) are rendered as **text wordmarks / labels with a small monochrome glyph slot**, not fetched brand logos. This is a deliberate constraint, not an omission:
-- **Local-only / no network:** the cockpit makes no outbound calls (brief §A4), so it ships **no remote logo assets**; identities stay as in-repo text.
-- **Runtime naming:** runtimes are labeled `Codex`, `Claude`, `Local runtime`. The legacy example runtime name listed in ATM-385 is intentionally **not used** — the repo's `public_safe_repo_scan.py` blocks it as a legacy surface (brief §8 / Q2). This is the one ATM-385 asset the design knowingly substitutes.
-- Mirror/Courier tools (Linear/Slack/GitHub) always appear **with the Mirror/Courier badge**, never as a bare logo, so a tool icon is never mistaken for source-of-truth.
+## 6a. Iconography & source/runtime icons
+The cockpit ships a **delivered icon set** for every source and runtime ATM-385 names: WEAVE, Linear, Slack, GitHub, Codex, Claude, Local runtime — see [`assets/icons/icon-set.svg`](assets/icons/icon-set.svg). These are **inline, in-repo SVG glyphs** (monochrome `--text-1`, with `--accent` reserved for the WEAVE mark), drawn as paths rather than fetched brand logos. That choice is dictated by the product, not a shortcut:
+- **Local-only / no network:** the cockpit makes no outbound calls (brief §A4), so it ships **no remote logo assets**; every glyph is a path in the repo and themes via `currentColor`.
+- **Where they appear:** runtime glyphs sit beside the runtime name on Command Center checkpoints, the Runtime panel, and Mission Detail (see the updated [Command Center hi-fi](assets/mockups/command-center-hifi.svg)); source glyphs sit on the **Mirror/Courier badge** for Linear/Slack/GitHub (see the [Gate hi-fi](assets/mockups/gates-hifi.svg)) — never as a bare logo, so a tool icon is never mistaken for source-of-truth.
+- **Runtime naming:** runtimes are `Codex`, `Claude`, `Local runtime`. The legacy example runtime name listed in ATM-385 is intentionally **not used** — `public_safe_repo_scan.py` blocks it as a legacy surface (brief §8 / Q2). This is the one ATM-385 asset the design knowingly substitutes; its icon slot is simply not minted.
+
+### 5.11 Source/Runtime Icon `<SourceIcon name>`
+12–16px inline glyph keyed by `name` (`weave|linear|slack|github|codex|claude|local`). Renders `currentColor` so it inherits text/badge color; never introduces a new hue. Pairs with a label or a MirrorBadge — never stands alone as a clickable brand logo.
 
 ## 6b. Hi-fi coverage & deferred screens
 Hi-fi mockups are delivered for the **two screens that carry the demo's decision weight**: Command Center (the attention hub) and the Gate / Approval Queue (the owner action). **Screens 2–6, 8, 9 (Rooms, Missions, Proof Ledger, Runtime, Settings) are deliberately deferred at hi-fi** — they are **not dropped**: their low-fi wireframes ([WIREFRAMES.md](WIREFRAMES.md)) plus the tokens and component specs in this document are the build spec, and they inherit the exact same Shell, palette, and components proven in the two hi-fi targets. ATM-386 builds all 9 against `tokens.css`; hi-fi for the deferred screens, if wanted, is a fast follow once the components exist in code.
