@@ -1,0 +1,73 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 900" font-family="Segoe UI, Arial, sans-serif">
+  <style>
+    .page{fill:#eef0f3}.banner{fill:#dfe3e8}.nav{fill:#f7f8fa}
+    .navItem{fill:#5b6573;font-size:14px}.navActive{fill:#dde2e8}
+    .brand{fill:#2b313b;font-weight:700;font-size:18px}.sub{fill:#9aa3b0;font-size:12px}
+    .panel{fill:#ffffff;stroke:#ccd2da}.title{fill:#2b313b;font-weight:700;font-size:20px}
+    .h2{fill:#2b313b;font-weight:600;font-size:15px}.label{fill:#707a88;font-size:13px}
+    .muted{fill:#9aa3b0;font-size:12px}.chip{fill:#f0f2f5;stroke:#b6bdc8}.chipT{fill:#5b6573;font-size:11px}
+    .row{fill:#fbfcfd;stroke:#e2e6eb}.col{fill:#f3f5f7;stroke:#dde2e8}
+    .ok{fill:#e9f0ea;stroke:#bcd0c0}.no{fill:#f3eaea;stroke:#d6c2c2}
+  </style>
+  <rect class="page" width="1440" height="900"/>
+  <rect class="banner" width="1440" height="30"/><text x="16" y="20" class="label">Local-only cockpit · fixture data · no secrets · external actions simulated</text>
+  <rect class="nav" y="30" width="220" height="870"/>
+  <text x="20" y="62" class="brand">WEAVE</text><text x="20" y="80" class="sub">Owner Cockpit · v0.2 draft</text>
+  <text x="24" y="122" class="navItem">Command Center</text><text x="24" y="162" class="navItem">Rooms</text>
+  <rect class="navActive" x="12" y="180" width="196" height="34" rx="6"/><text x="24" y="202" class="navItem" font-weight="700" fill="#2b313b">Missions</text>
+  <text x="24" y="242" class="navItem">Proof Ledger</text><text x="24" y="282" class="navItem">Gates</text><text x="24" y="322" class="navItem">Runtime</text><text x="24" y="362" class="navItem">Settings</text>
+
+  <text x="244" y="64" class="title">Missions</text><text x="244" y="84" class="muted">Bounded work packets across all Rooms</text>
+
+  <!-- BOARD -->
+  <text x="262" y="120" class="h2">Mission board</text>
+  <rect class="col" x="244" y="132" width="378" height="210" rx="8"/><text x="260" y="156" class="label">Open</text>
+  <rect class="row" x="258" y="166" width="350" height="70" rx="6"/><text x="270" y="190" class="label">Prepare production deploy packet</text><text x="270" y="210" class="muted">Receipts · Codex · due Jul 2</text><rect class="chip" x="270" y="216" width="62" height="16" rx="8"/><text x="276" y="228" class="chipT">Blocked</text>
+  <rect class="row" x="258" y="244" width="350" height="70" rx="6"/><text x="270" y="268" class="label">Connect Linear write access</text><text x="270" y="288" class="muted">Habit · Local runtime · due Jul 1</text><rect class="chip" x="270" y="294" width="104" height="16" rx="8"/><text x="276" y="306" class="chipT">Approval req.</text>
+
+  <rect class="col" x="638" y="132" width="378" height="210" rx="8"/><text x="654" y="156" class="label">In progress</text>
+  <rect class="row" x="652" y="166" width="350" height="70" rx="6"/><text x="664" y="190" class="label">Wire receipt export</text><text x="664" y="210" class="muted">Receipts · Claude · due Jul 1</text><rect class="chip" x="664" y="216" width="56" height="16" rx="8"/><text x="670" y="228" class="chipT">None</text>
+  <rect class="row" x="652" y="244" width="350" height="70" rx="6"/><text x="664" y="268" class="label">Build calculator core</text><text x="664" y="288" class="muted">Calculator · Claude · due Jun 30</text><rect class="chip" x="664" y="294" width="56" height="16" rx="8"/><text x="670" y="306" class="chipT">None</text>
+
+  <rect class="col" x="1032" y="132" width="376" height="210" rx="8"/><text x="1048" y="156" class="label">Ready for review</text>
+  <rect class="row" x="1046" y="166" width="348" height="70" rx="6"/><text x="1058" y="190" class="label">Calculator engineering proof</text><text x="1058" y="210" class="muted">Calculator · Claude · TASK-0007</text><rect class="chip" x="1058" y="216" width="110" height="16" rx="8"/><text x="1064" y="228" class="chipT">Ready review</text>
+
+  <!-- DETAIL -->
+  <rect class="panel" x="244" y="360" width="1164" height="506" rx="8"/>
+  <text x="262" y="390" class="h2">Mission detail — Prepare production deploy packet</text>
+  <text x="262" y="414" class="muted">TASK-0011 · Room: Receipts App · stage: deployment</text>
+  <rect class="chip" x="1140" y="376" width="62" height="20" rx="10"/><text x="1148" y="390" class="chipT">Blocked</text>
+
+  <text x="262" y="450" class="label">Objective</text>
+  <rect class="row" x="262" y="460" width="700" height="44" rx="6"/><text x="274" y="487" class="label">Assemble a deploy packet and identify the exact owner approval needed for production.</text>
+
+  <!-- scope columns -->
+  <rect class="ok" x="262" y="520" width="344" height="150" rx="6"/><text x="276" y="544" class="h2">Allowed</text>
+  <text x="276" y="572" class="muted">· public-safe repo files</text><text x="276" y="594" class="muted">· local WEAVE skeleton state</text><text x="276" y="616" class="muted">· deterministic procedure prompts</text><text x="276" y="638" class="muted">· public docs &amp; tests</text>
+  <rect class="no" x="620" y="520" width="344" height="150" rx="6"/><text x="634" y="544" class="h2">Forbidden</text>
+  <text x="634" y="572" class="muted">· production deploy without approval</text><text x="634" y="594" class="muted">· real external sends / tracker writes</text><text x="634" y="616" class="muted">· raw secrets / credentials</text><text x="634" y="638" class="muted">· claiming full-lifecycle completion</text>
+
+  <!-- right side meta -->
+  <rect class="row" x="990" y="460" width="400" height="210" rx="6"/>
+  <text x="1006" y="486" class="h2">Runtime &amp; proof</text>
+  <text x="1006" y="514" class="label">Runtime: Codex</text><text x="1006" y="534" class="muted">checkpoint: healthy · 4m ago</text>
+  <text x="1006" y="562" class="label">Due: Jul 2, 2026</text>
+  <text x="1006" y="590" class="label">Evidence required</text>
+  <text x="1006" y="610" class="muted">☐ deploy target named  ☐ owner approval</text><text x="1006" y="628" class="muted">☐ post-deploy QA plan  ☐ non-claims</text>
+  <text x="1006" y="656" class="label">Proof status: missing</text>
+
+  <!-- review loop stepper -->
+  <text x="262" y="706" class="label">Review loop</text>
+  <g>
+    <rect class="row" x="262" y="716" width="120" height="30" rx="6"/><text x="276" y="735" class="chipT">Observe ✓</text>
+    <rect class="row" x="390" y="716" width="120" height="30" rx="6"/><text x="404" y="735" class="chipT">Validate •</text>
+    <rect class="row" x="518" y="716" width="120" height="30" rx="6"/><text x="532" y="735" class="chipT">Govern •</text>
+    <rect class="row" x="646" y="716" width="120" height="30" rx="6"/><text x="660" y="735" class="chipT">Review ○</text>
+    <rect class="row" x="774" y="716" width="120" height="30" rx="6"/><text x="788" y="735" class="chipT">Sync ○</text>
+  </g>
+  <!-- non-claims + action -->
+  <rect x="262" y="762" width="700" height="70" rx="6" fill="#f5f6f8" stroke="#e2e6eb"/><text x="276" y="784" class="muted" font-weight="700">Not proven</text><text x="276" y="804" class="muted">does not prove deployment · live tracker mutation · billing · full-lifecycle completion</text>
+  <rect class="row" x="990" y="762" width="260" height="44" rx="6"/><text x="1004" y="789" class="label">Mark ready for review (local-only)</text>
+
+  <text x="244" y="888" class="muted">Wireframe · low-fidelity — board (top) + detail (bottom). Detail = route /missions/[id].</text>
+</svg>

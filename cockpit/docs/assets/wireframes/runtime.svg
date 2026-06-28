@@ -1,0 +1,54 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 900" font-family="Segoe UI, Arial, sans-serif">
+  <style>
+    .page{fill:#eef0f3}.banner{fill:#dfe3e8}.nav{fill:#f7f8fa}
+    .navItem{fill:#5b6573;font-size:14px}.navActive{fill:#dde2e8}
+    .brand{fill:#2b313b;font-weight:700;font-size:18px}.sub{fill:#9aa3b0;font-size:12px}
+    .panel{fill:#ffffff;stroke:#ccd2da}.title{fill:#2b313b;font-weight:700;font-size:20px}
+    .h2{fill:#2b313b;font-weight:600;font-size:15px}.label{fill:#707a88;font-size:13px}
+    .muted{fill:#9aa3b0;font-size:12px}.chip{fill:#f0f2f5;stroke:#b6bdc8}.chipT{fill:#5b6573;font-size:11px}
+    .row{fill:#fbfcfd;stroke:#e2e6eb}.sel{fill:#eef2f6;stroke:#aeb6c1}
+    .ok{fill:#e9f0ea;stroke:#bcd0c0}.wait{fill:#f3eee4;stroke:#d8caa6}.btn{fill:#e3e7ec;stroke:#aeb6c1}.btnT{fill:#2b313b;font-size:13px;font-weight:600}
+  </style>
+  <rect class="page" width="1440" height="900"/>
+  <rect class="banner" width="1440" height="30"/><text x="16" y="20" class="label">Local-only cockpit · fixture data · no secrets · external actions simulated</text>
+  <rect class="nav" y="30" width="220" height="870"/>
+  <text x="20" y="62" class="brand">WEAVE</text><text x="20" y="80" class="sub">Owner Cockpit · v0.2 draft</text>
+  <text x="24" y="122" class="navItem">Command Center</text><text x="24" y="162" class="navItem">Rooms</text><text x="24" y="202" class="navItem">Missions</text><text x="24" y="242" class="navItem">Proof Ledger</text><text x="24" y="282" class="navItem">Gates</text>
+  <rect class="navActive" x="12" y="300" width="196" height="34" rx="6"/><text x="24" y="322" class="navItem" font-weight="700" fill="#2b313b">Runtime</text>
+  <text x="24" y="362" class="navItem">Settings</text>
+
+  <text x="244" y="64" class="title">Runtime / Agent</text><text x="244" y="84" class="muted">Second channel to your agents — local notes only, nothing is sent externally</text>
+
+  <!-- runtime list -->
+  <rect class="panel" x="244" y="100" width="420" height="766" rx="8"/>
+  <text x="262" y="128" class="h2">Runtimes</text>
+  <rect class="sel" x="258" y="144" width="392" height="92" rx="6"/><text x="272" y="170" class="label" font-weight="700">Codex</text><rect class="ok" x="560" y="156" width="76" height="18" rx="9"/><text x="572" y="169" class="chipT">healthy</text><text x="272" y="194" class="muted">mission: Prepare deploy packet (Receipts)</text><text x="272" y="214" class="muted">last checkpoint · 4m ago</text>
+  <rect class="row" x="258" y="244" width="392" height="92" rx="6"/><text x="272" y="270" class="label" font-weight="700">Claude</text><rect class="ok" x="560" y="256" width="76" height="18" rx="9"/><text x="572" y="269" class="chipT">healthy</text><text x="272" y="294" class="muted">mission: Wire receipt export (Receipts)</text><text x="272" y="314" class="muted">last checkpoint · 11m ago</text>
+  <rect class="row" x="258" y="344" width="392" height="92" rx="6"/><text x="272" y="370" class="label" font-weight="700">Local runtime</text><rect class="wait" x="560" y="356" width="92" height="18" rx="9"/><text x="572" y="369" class="chipT">awaiting input</text><text x="272" y="394" class="muted">mission: Connect Linear access (Habit)</text><text x="272" y="414" class="muted">last checkpoint · 22m ago</text>
+
+  <!-- selected detail -->
+  <rect class="panel" x="684" y="100" width="724" height="766" rx="8"/>
+  <text x="702" y="128" class="h2">Codex</text>
+  <rect class="ok" x="760" y="112" width="76" height="20" rx="10"/><text x="772" y="126" class="chipT">healthy</text>
+  <text x="702" y="156" class="muted">attached mission: Prepare production deploy packet · TASK-0011</text>
+
+  <text x="702" y="194" class="label">Blocker / input request</text>
+  <rect class="wait" x="702" y="206" width="688" height="80" rx="6"/>
+  <text x="716" y="230" class="muted" font-weight="700">Needs owner</text>
+  <text x="716" y="252" class="muted">"Which deploy target should I prepare the packet for? Provider access is not yet validated."</text>
+  <text x="716" y="272" class="muted">raised 4m ago</text>
+
+  <text x="702" y="320" class="label">Recent status history</text>
+  <rect class="row" x="702" y="332" width="688" height="40" rx="6"/><text x="716" y="357" class="muted">4m · raised input request (deploy target)</text>
+  <rect class="row" x="702" y="380" width="688" height="40" rx="6"/><text x="716" y="405" class="muted">19m · drafted deploy packet outline (local)</text>
+  <rect class="row" x="702" y="428" width="688" height="40" rx="6"/><text x="716" y="453" class="muted">31m · loaded stage-entry contract (deployment)</text>
+
+  <!-- composer -->
+  <text x="702" y="520" class="label">Leave a note</text>
+  <rect class="row" x="702" y="532" width="688" height="120" rx="6"/>
+  <text x="716" y="560" class="muted">Type a note to this runtime…</text>
+  <rect class="btn" x="702" y="668" width="240" height="44" rx="6"/><text x="722" y="695" class="btnT">Post note (local-only)</text>
+  <text x="960" y="695" class="muted">Stored locally · not sent externally</text>
+
+  <text x="244" y="888" class="muted">Wireframe · low-fidelity — runtime list (left) + selected-runtime detail with local-only note composer (right).</text>
+</svg>

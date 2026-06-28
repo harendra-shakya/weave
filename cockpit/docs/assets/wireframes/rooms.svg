@@ -1,0 +1,77 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 900" font-family="Segoe UI, Arial, sans-serif">
+  <style>
+    .page{fill:#eef0f3}.banner{fill:#dfe3e8}.nav{fill:#f7f8fa}
+    .navItem{fill:#5b6573;font-size:14px}.navActive{fill:#dde2e8}
+    .brand{fill:#2b313b;font-weight:700;font-size:18px}.sub{fill:#9aa3b0;font-size:12px}
+    .panel{fill:#ffffff;stroke:#ccd2da}.title{fill:#2b313b;font-weight:700;font-size:20px}
+    .h2{fill:#2b313b;font-weight:600;font-size:15px}.label{fill:#707a88;font-size:13px}
+    .muted{fill:#9aa3b0;font-size:12px}.chip{fill:#f0f2f5;stroke:#b6bdc8}.chipT{fill:#5b6573;font-size:11px}
+    .row{fill:#fbfcfd;stroke:#e2e6eb}.step{fill:#eef1f4;stroke:#c4cbd4}.stepA{fill:#d7dde4;stroke:#9aa3b0}
+  </style>
+  <rect class="page" width="1440" height="900"/>
+  <rect class="banner" width="1440" height="30"/><text x="16" y="20" class="label">Local-only cockpit · fixture data · no secrets · external actions simulated</text>
+  <rect class="nav" y="30" width="220" height="870"/>
+  <text x="20" y="62" class="brand">WEAVE</text><text x="20" y="80" class="sub">Owner Cockpit · v0.2 draft</text>
+  <text x="24" y="122" class="navItem">Command Center</text>
+  <rect class="navActive" x="12" y="140" width="196" height="34" rx="6"/><text x="24" y="162" class="navItem" font-weight="700" fill="#2b313b">Rooms</text>
+  <text x="24" y="202" class="navItem">Missions</text><text x="24" y="242" class="navItem">Proof Ledger</text>
+  <text x="24" y="282" class="navItem">Gates</text><text x="24" y="322" class="navItem">Runtime</text><text x="24" y="362" class="navItem">Settings</text>
+
+  <text x="244" y="64" class="title">Rooms</text><text x="244" y="84" class="muted">Every app workspace in your company graph</text>
+  <rect class="chip" x="1240" y="50" width="168" height="22" rx="11"/><text x="1252" y="65" class="chipT">filter: attention state ▾</text>
+
+  <!-- LIST -->
+  <rect class="panel" x="244" y="100" width="1164" height="250" rx="8"/>
+  <text x="262" y="128" class="h2">Room list</text>
+  <text x="262" y="156" class="muted">NAME</text><text x="470" y="156" class="muted">APP ID</text><text x="700" y="156" class="muted">STAGE</text><text x="900" y="156" class="muted">OPEN MISSIONS</text><text x="1120" y="156" class="muted">ATTENTION</text>
+  <line x1="262" y1="166" x2="1390" y2="166" stroke="#e2e6eb"/>
+  <g class="label">
+    <text x="262" y="196">Receipts App</text><text x="470" y="196" class="muted">receipts-app</text><text x="700" y="196">deployment</text><text x="940" y="196">3</text><rect class="chip" x="1120" y="182" width="62" height="18" rx="9"/><text x="1128" y="195" class="chipT">Blocked</text>
+    <text x="262" y="236">Habit Tracker</text><text x="470" y="236" class="muted">habit-tracker</text><text x="700" y="236">engineering</text><text x="940" y="236">2</text><rect class="chip" x="1120" y="222" width="104" height="18" rx="9"/><text x="1128" y="235" class="chipT">Approval req.</text>
+    <text x="262" y="276">Calculator</text><text x="470" y="276" class="muted">tiny-local-calculator</text><text x="700" y="276">qa</text><text x="940" y="276">1</text><rect class="chip" x="1120" y="262" width="110" height="18" rx="9"/><text x="1128" y="275" class="chipT">Ready review</text>
+    <text x="262" y="316">Notes App</text><text x="470" y="316" class="muted">notes-app</text><text x="700" y="316">selection</text><text x="940" y="316">1</text><rect class="chip" x="1120" y="302" width="98" height="18" rx="9"/><text x="1128" y="315" class="chipT">Stale</text>
+  </g>
+
+  <!-- DETAIL -->
+  <rect class="panel" x="244" y="366" width="1164" height="500" rx="8"/>
+  <text x="262" y="396" class="h2">Room detail — Receipts App</text>
+  <rect class="chip" x="510" y="380" width="62" height="20" rx="10"/><text x="518" y="394" class="chipT">Blocked</text>
+  <rect class="chip" x="582" y="380" width="210" height="20" rx="10"/><text x="590" y="394" class="chipT">Linear · Mirror (not source of truth)</text>
+
+  <!-- stage rail -->
+  <text x="262" y="426" class="label">Lifecycle (11 stages)</text>
+  <g>
+    <rect class="stepA" x="262" y="436" width="92" height="30" rx="4"/><text x="270" y="455" class="chipT">Intent ✓</text>
+    <rect class="stepA" x="360" y="436" width="92" height="30" rx="4"/><text x="368" y="455" class="chipT">Research ✓</text>
+    <rect class="stepA" x="458" y="436" width="92" height="30" rx="4"/><text x="466" y="455" class="chipT">Selection ✓</text>
+    <rect class="stepA" x="556" y="436" width="80" height="30" rx="4"/><text x="564" y="455" class="chipT">Plan ✓</text>
+    <rect class="stepA" x="642" y="436" width="104" height="30" rx="4"/><text x="650" y="455" class="chipT">Engineer ✓</text>
+    <rect class="stepA" x="752" y="436" width="64" height="30" rx="4"/><text x="760" y="455" class="chipT">QA ✓</text>
+    <rect class="step" x="822" y="436" width="104" height="30" rx="4" stroke-dasharray="4 3"/><text x="830" y="455" class="chipT">Deploy ⚠</text>
+    <rect class="step" x="932" y="436" width="80" height="30" rx="4"/><text x="940" y="455" class="chipT">KPI</text>
+    <rect class="step" x="1018" y="436" width="92" height="30" rx="4"/><text x="1026" y="455" class="chipT">Marketing</text>
+    <rect class="step" x="1116" y="436" width="90" height="30" rx="4"/><text x="1124" y="455" class="chipT">Iteration</text>
+    <rect class="step" x="1212" y="436" width="90" height="30" rx="4"/><text x="1220" y="455" class="chipT">Analysis</text>
+  </g>
+
+  <!-- columns -->
+  <text x="262" y="500" class="h2">Active Missions</text>
+  <rect class="row" x="262" y="512" width="360" height="56" rx="6"/><text x="274" y="536" class="label">Prepare production deploy packet</text><text x="274" y="556" class="muted">Codex · proof: missing</text>
+  <rect class="row" x="262" y="576" width="360" height="56" rx="6"/><text x="274" y="600" class="label">Wire receipt export</text><text x="274" y="620" class="muted">Claude · proof: recorded</text>
+
+  <text x="650" y="500" class="h2">Proof &amp; evidence summary</text>
+  <rect class="row" x="650" y="512" width="360" height="56" rx="6"/><text x="662" y="536" class="label">"Receipt export wired locally"</text><text x="662" y="556" class="muted">surface: TOOL_VERIFIED_LOCAL</text>
+  <rect class="row" x="650" y="576" width="360" height="56" rx="6"/><text x="662" y="600" class="label">"Skeleton state created"</text><text x="662" y="620" class="muted">surface: TOOL_VERIFIED_LOCAL</text>
+
+  <text x="1038" y="500" class="h2">Blockers</text>
+  <rect class="row" x="1038" y="512" width="352" height="120" rx="6"/>
+  <rect class="chip" x="1050" y="524" width="120" height="18" rx="9"/><text x="1058" y="537" class="chipT">blocked_until_validated</text>
+  <text x="1050" y="566" class="muted">missing: cloudflare + vercel access</text>
+  <text x="1050" y="588" class="muted">next: validate provider access via</text><text x="1050" y="606" class="muted">connector/MCP before deploy</text>
+
+  <text x="262" y="676" class="h2">Linked artifacts</text>
+  <text x="262" y="702" class="muted">app.json · lifecycle.json · deployment-gates.json · proof/proof-tray.json · blockers/blocker-tray.json</text>
+  <rect class="row" x="262" y="720" width="280" height="40" rx="6"/><text x="276" y="745" class="label">Acknowledge blocker (local-only)</text>
+
+  <text x="244" y="888" class="muted">Wireframe · low-fidelity — list (top) + detail (bottom). Detail = route /rooms/[id].</text>
+</svg>
