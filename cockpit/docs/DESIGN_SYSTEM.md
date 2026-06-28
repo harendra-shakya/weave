@@ -91,6 +91,9 @@ The three non-populated states every data screen needs (per-screen copy is speci
 - **LoadingSkeleton** — greyed placeholder rows/cards using `--bg-2` blocks at ~50% on `--bg-1`; **no spinner** (reads are local + synchronous-feeling). Mirrors the real layout's row/card shape so there's no reflow jump.
 - **ErrorPanel** — bordered panel, `--border-strong`, `--text-1` body with a muted secondary line pointing to Settings. **Safe by construction:** shows the `<cockpit>/fixtures/…` placeholder path only — never a real user home path, secret, or raw stack trace. Uses neutral chrome, not `--attn-blocked`, so a read failure is never confused with a WEAVE "blocked" state.
 
+### 5.11 Source/Runtime Icon `<SourceIcon name>`
+12–16px inline glyph keyed by `name` (`weave|linear|slack|github|codex|claude|local`), from [`assets/icons/icon-set.svg`](assets/icons/icon-set.svg). Renders `currentColor` so it inherits text/badge color; never introduces a new hue. Pairs with a label or a MirrorBadge — never stands alone as a clickable brand logo.
+
 ---
 
 ## 6. States & interaction notes
@@ -105,9 +108,6 @@ The cockpit ships a **delivered icon set** for every source and runtime ATM-385 
 - **Local-only / no network:** the cockpit makes no outbound calls (brief §A4), so it ships **no remote logo assets**; every glyph is a path in the repo and themes via `currentColor`.
 - **Where they appear:** runtime glyphs sit beside the runtime name on Command Center checkpoints, the Runtime panel, and Mission Detail (see the updated [Command Center hi-fi](assets/mockups/command-center-hifi.svg)); source glyphs sit on the **Mirror/Courier badge** for Linear/Slack/GitHub (see the [Gate hi-fi](assets/mockups/gates-hifi.svg)) — never as a bare logo, so a tool icon is never mistaken for source-of-truth.
 - **Runtime naming:** runtimes are `Codex`, `Claude`, `Local runtime`. The legacy example runtime name listed in ATM-385 is intentionally **not used** — `public_safe_repo_scan.py` blocks it as a legacy surface (brief §8 / Q2). This is the one ATM-385 asset the design knowingly substitutes; its icon slot is simply not minted.
-
-### 5.11 Source/Runtime Icon `<SourceIcon name>`
-12–16px inline glyph keyed by `name` (`weave|linear|slack|github|codex|claude|local`). Renders `currentColor` so it inherits text/badge color; never introduces a new hue. Pairs with a label or a MirrorBadge — never stands alone as a clickable brand logo.
 
 ## 6b. Hi-fi coverage & deferred screens
 Hi-fi mockups are delivered for the **two screens that carry the demo's decision weight**: Command Center (the attention hub) and the Gate / Approval Queue (the owner action). **Screens 2–6, 8, 9 (Rooms, Missions, Proof Ledger, Runtime, Settings) are deliberately deferred at hi-fi** — they are **not dropped**: their low-fi wireframes ([WIREFRAMES.md](WIREFRAMES.md)) plus the tokens and component specs in this document are the build spec, and they inherit the exact same Shell, palette, and components proven in the two hi-fi targets. ATM-386 builds all 9 against `tokens.css`; hi-fi for the deferred screens, if wanted, is a fast follow once the components exist in code.
