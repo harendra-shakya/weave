@@ -36,29 +36,55 @@ Each primitive is defined twice: the **concept** (how to talk about it to George
 
 ---
 
+## 1A. Actors / personas
+
+Who the cockpit serves and represents. Only the Owner takes binding decisions; everyone else produces state the Owner inspects.
+
+| Actor | Who / what | Goal in the cockpit | Authority |
+|---|---|---|---|
+| **Owner / Controller (George)** | The sovereign decision-maker for the Castle. | See what needs him, inspect why, take the few decisions that are genuinely his. | **Full** — approves/holds Gates, acknowledges blockers, marks ready-for-review. The only actor who can clear an approval. |
+| **Runtime / worker** | The agent identity executing a Mission: `Codex`, `Claude`, `Local runtime`. | Emit checkpoints, raise blockers / input-requests, advance stages by recording proof. | None over Gates. *(The legacy example runtime name ATM-383 lists is substituted here — see §8 Q2.)* |
+| **Reviewer / evaluator** | The review-loop (`observe→validate→govern→review→sync`) and the eval hard gates in `packages/weave-tool/evals/lifecycle/*.yaml`. | Validate proof before a claim is accepted; emit `ACCEPT_FOR_SCOPE` / `REVISE` / `BLOCKED` / `NEEDS_OWNER_ACTION`. | Automated; can block a transition but cannot grant an owner approval. May be the Owner acting as reviewer. |
+| **External Mirror / Courier** | Linear (Mirror), GitHub (Mirror), Slack (Courier). | Reflect or carry state outward. | **Never source of truth.** This sprint they are shown disconnected / simulated; no real writes. |
+| **Future peer Castle** | Another owner's sovereign graph (Treaty/Embassy). | Inter-Castle cooperation. | **Out of scope** — fixture-only placeholder; not built this sprint. |
+
+---
+
 ## 2. User stories / Jobs-To-Be-Done (owner = George)
 
-Prioritized; each maps to a screen (§5) and an acceptance check.
+Prioritized; each maps to a screen (§5) and carries an **acceptance / proof note** (how we know the story is satisfied; this is what QA in ATM-387 checks).
 
 **Epic A — Situational awareness ("what needs me?")**
 - **A1.** As the owner, I want one screen showing everything that needs my attention (approvals, blocked, ready-for-review), so I don't have to open each app. → *Command Center*
+  - **Acceptance:** every item whose derived attention (§3.3) ∈ {blocked, approval required, needs owner, ready for review} appears, severity-sorted; the on-screen counts equal the sum across all Rooms' trays.
 - **A2.** As the owner, I want to see all my Rooms and each Room's current lifecycle stage and status at a glance. → *Room List*
+  - **Acceptance:** each Room row shows `current_stage` and exactly one attention pill matching the §3.3 derivation for that Room.
 - **A3.** As the owner, I want to see the latest runtime checkpoints so I know my agents are alive and where they are. → *Command Center / Runtime panel*
+  - **Acceptance:** latest checkpoint per runtime shows derived health + age; rendered from fixture data with **no outbound network call**.
 
 **Epic B — Inspection ("why is this the state?")**
 - **B1.** As the owner, I want to open a Room and see its 11-stage lifecycle rail with which stage is active, complete, or blocked. → *Room Detail*
+  - **Acceptance:** the rail renders all 11 stages in order, each with its `state` + `proof_state` taken verbatim from `lifecycle.json`.
 - **B2.** As the owner, I want to open a Mission and read its objective, scope, allowed/forbidden actions, runtime, and proof status. → *Mission Detail*
+  - **Acceptance:** objective, Allowed vs Forbidden, assigned runtime, and proof status all render from `tasks.json` + the linked `WP-*.md`; nothing is hard-coded.
 - **B3.** As the owner, I want to inspect a Proof Envelope: the claim, its evidence refs, the proof surface, and crucially the **non-claims**, so I never mistake local proof for deployment/live proof. → *Proof Ledger*
+  - **Acceptance:** `claim`, `proof_surface`, `artifact_refs[]`, and `non_claims[]` are all visible; a real local proof and a `SIMULATED` external effect are visually distinct.
 - **B4.** As the owner, I want to see exactly why something is blocked and what the safe next action is. → *Room Detail / Gate Queue*
+  - **Acceptance:** the blocker's `state`, `missing[]`, and `next_action` are shown; no action button performs the external effect.
 
 **Epic C — Action ("let me decide, safely")**
 - **C1.** As the owner, I want to approve or hold a gated action, with the decision persisted, while any external effect is **simulated only**. → *Gate / Approval Queue* (the sprint's required owner action)
+  - **Acceptance:** Approve/Hold writes the decision to the local overlay and appends an event tagged `SIMULATED`; **no external call is made**; the decision survives refresh **and** dev-server restart.
 - **C2.** As the owner, I want to acknowledge a blocker / mark an item ready-for-review and have it stick across refresh and restart. → *any screen → overlay*
+  - **Acceptance:** the overlay write is reflected after a full reload and after a process restart (read back from the overlay file, not memory).
 - **C3.** As the owner, I want to leave a note for a runtime as a second channel of communication, written locally with no real send. → *Runtime panel*
+  - **Acceptance:** the note persists to the local overlay; no message is sent to any external surface.
 
 **Epic D — Trust ("never lie to me")**
 - **D1.** As the owner, I want every screen to make the proof boundary explicit: what is proven, fixture-backed, local-only, and not-verified. → *Settings + persistent boundary banner*
+  - **Acceptance:** the boundary banner is present on every route; Settings states, in words, what is proven vs fixture-backed vs local-only vs not-externally-verified.
 - **D2.** As the owner, I want Linear/Slack/GitHub clearly labeled as Mirrors/Couriers, not the source of truth. → *Mirror banner on relevant screens*
+  - **Acceptance:** every Linear/Slack/GitHub reference carries a "Mirror/Courier — not source of truth" badge and a disconnected/simulated status.
 
 ---
 
@@ -75,6 +101,9 @@ Prioritized; each maps to a screen (§5) and an acceptance check.
 - **Blocker** (`weave-cos-blocker-tray/v0.1`): `blockers[]{ id, state, missing[], next_action }`.
 - **Review item** (`weave-cos-review-queue/v0.1`): `items[]{ id, artifact_refs[], decision, loop[], state }`.
 - **Event** (`weave-cos-event/v0.1`): `{ app_id, at, event, intent, state }` (one JSON object per line in `events.jsonl`).
+- **Runtime** (composed view; `app.json#worker_orchestration` + task assignment): `identity` (`Codex` / `Claude` / `Local runtime`), `mode`, assigned `task_id`, derived `health` (see §3.2), `last_checkpoint{ status, at }`. *(0.1 stores no standalone "runtime" schema — the cockpit composes this from orchestration + task fields.)*
+- **MirrorCourier** (`app.json#tracker`): `tool` (`Linear` / `Slack` / `GitHub`), `kind` (`Mirror` | `Courier`), `mode` (`local`), `linear_required` (`false`), derived `connection` (`disconnected` / `simulated`). **Never the source of truth.**
+- **AttentionItem** (derived, not stored): `{ subject_ref (room | mission | gate), attention_state (§3.3), reason, source_field, target_route }` — the unit the Command Center lists and severity-sorts.
 
 ### 3.2 Enumerations (use these exact strings as UI labels)
 
@@ -86,6 +115,9 @@ Prioritized; each maps to a screen (§5) and an acceptance check.
 - **Gate `proof_state` (per provider):** `not_validated`, `validated`.
 - **Allowed done states (completion contract):** `ACCEPT_FOR_SCOPE`, `DONE_FOR_SCOPE_ONLY`, `REVISION_REQUIRED`, `BLOCKED`, `NEEDS_OWNER_ACTION`.
 - **Review-loop return values:** `ACCEPT_FOR_SCOPE`, `REVISE`, `BLOCKED`, `NEEDS_OWNER_ACTION`.
+- **Mission/Task states** (task ledger `state`, normalized for the board): `not_started`, `in_progress`, `awaiting_review`, `done_for_scope`, `blocked`, `needs_owner_action` — aligned to the completion-contract done states above (a Mission's done state is one of `ACCEPT_FOR_SCOPE` / `DONE_FOR_SCOPE_ONLY` / `REVISION_REQUIRED` / `BLOCKED` / `NEEDS_OWNER_ACTION`).
+- **Runtime states** (derived, see §3.1 Runtime): `healthy` (recent checkpoint, no open input-request), `idle` (no active Mission), `blocked` (awaiting owner input / open blocker), `offline` (no recent checkpoint). Not a stored field — composed from checkpoint recency + blocker/input-request presence.
+- **Mirror / readback states:** mirror `connection` = `disconnected` | `simulated` (this sprint) | `connected` (future, out of scope); **readback** (`updates/readback.json`) = `pending` (owner has not seen the latest pushed state line) | `acknowledged` | `stale` (a newer state line exists than the one last acknowledged).
 
 ### 3.3 Owner Attention state — the derived status (cockpit's core vocabulary)
 
