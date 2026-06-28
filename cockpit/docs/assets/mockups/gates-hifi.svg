@@ -1,0 +1,69 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 900" font-family="Segoe UI, Roboto, Arial, sans-serif">
+  <style>
+    .title{fill:#e6ebf2;font-weight:700;font-size:20px}.h2{fill:#e6ebf2;font-weight:600;font-size:15px}
+    .label{fill:#aab4c0;font-size:13px}.muted{fill:#6f7d8c;font-size:12px}
+    .nav{fill:#aab4c0;font-size:14px}.navA{fill:#4f8cff;font-size:14px;font-weight:700}
+    .pillT{font-size:11px;font-weight:600}.mono{font-family:Consolas,monospace;fill:#aab4c0;font-size:12px}
+  </style>
+  <rect width="1440" height="900" fill="#0e1116"/>
+  <rect width="1440" height="30" fill="#1a212a"/><text x="16" y="20" class="muted">Local-only cockpit · fixture data · no secrets · external actions simulated</text>
+  <rect y="30" width="220" height="870" fill="#151a21"/>
+  <text x="20" y="62" fill="#e6ebf2" font-weight="700" font-size="18">WEAVE</text><text x="20" y="80" class="muted">Owner Cockpit · v0.2 draft</text>
+  <text x="24" y="122" class="nav">Command Center</text><text x="24" y="162" class="nav">Rooms</text><text x="24" y="202" class="nav">Missions</text><text x="24" y="242" class="nav">Proof Ledger</text>
+  <rect x="12" y="260" width="196" height="34" rx="6" fill="#1c232c"/><text x="24" y="282" class="navA">Gates</text>
+  <text x="24" y="322" class="nav">Runtime</text><text x="24" y="362" class="nav">Settings</text>
+
+  <text x="244" y="64" class="title">Gate / Approval Queue</text>
+  <text x="244" y="84" class="muted">Risky transitions blocked until you approve — external effects are simulated only</text>
+
+  <!-- GATE 1 -->
+  <rect x="244" y="100" width="1164" height="330" rx="8" fill="#151a21" stroke="#2b3543"/>
+  <text x="262" y="130" class="h2">Deploy Receipts App to production</text>
+  <g class="pillT">
+    <rect x="640" y="114" width="118" height="20" rx="10" fill="rgba(255,184,77,0.14)"/><text x="648" y="128" fill="#ffb84d">Approval required</text>
+    <rect x="770" y="114" width="148" height="20" rx="10" fill="rgba(255,93,93,0.14)"/><text x="778" y="128" fill="#ff5d5d">blast radius: HIGH</text>
+  </g>
+
+  <text x="262" y="166" class="label">Required approval / proof</text>
+  <rect x="262" y="178" width="540" height="130" rx="6" fill="#1c232c"/>
+  <text x="276" y="202" class="muted">Provider access must be validated before deploy:</text>
+  <g class="pillT">
+    <rect x="276" y="214" width="220" height="20" rx="10" fill="rgba(255,93,93,0.14)"/><text x="284" y="228" fill="#ff5d5d">cloudflare · not_validated</text>
+    <rect x="276" y="242" width="220" height="20" rx="10" fill="rgba(255,93,93,0.14)"/><text x="284" y="256" fill="#ff5d5d">vercel · not_validated</text>
+  </g>
+  <text x="276" y="288" class="mono">caps: domain_authority, dns_*, hosting_project_access …</text>
+
+  <text x="828" y="166" class="label">Decision</text>
+  <rect x="828" y="178" width="560" height="130" rx="6" fill="#1c232c"/>
+  <text x="844" y="202" class="muted">current: blocked_until_validated · launch_allowed = false</text>
+  <rect x="844" y="216" width="220" height="46" rx="6" fill="#15233f" stroke="#4f8cff"/><text x="864" y="244" fill="#cfe0ff" font-size="13" font-weight="700">Approve (local-only)</text>
+  <rect x="1080" y="216" width="120" height="46" rx="6" fill="#232c37" stroke="#3a4654"/><text x="1104" y="244" fill="#e6ebf2" font-size="13" font-weight="600">Hold</text>
+  <text x="844" y="288" fill="#d8b271" font-size="12" font-weight="700">⚠ External effect is SIMULATED — no real deploy / DNS / credential action is performed.</text>
+
+  <!-- non-claims -->
+  <rect x="262" y="324" width="1126" height="86" rx="6" fill="#1c232c"/>
+  <text x="276" y="350" class="muted" font-weight="700">Not proven by approving here</text>
+  <text x="276" y="372" class="muted">does not prove provider account access · does not perform DNS mutation · does not store raw secrets</text>
+  <text x="276" y="392" class="muted">records a local owner decision + a SIMULATED event only</text>
+
+  <!-- GATE 2 approved -->
+  <rect x="244" y="450" width="1164" height="180" rx="8" fill="#151a21" stroke="#2b3543"/>
+  <text x="262" y="480" class="h2">Connect Linear write access (mirror)</text>
+  <rect x="560" y="464" width="220" height="20" rx="10" fill="rgba(70,201,128,0.14)"/><text x="568" y="478" fill="#46c980" font-size="11" font-weight="600">Approved (local-only · simulated)</text>
+  <text x="262" y="510" class="muted">blast radius: MEDIUM · Linear is a Mirror/Courier — never the source of truth</text>
+  <rect x="262" y="526" width="700" height="84" rx="6" fill="#1c232c" stroke="#2f4034"/>
+  <text x="276" y="552" fill="#46c980" font-size="12" font-weight="700">Confirmation</text>
+  <text x="276" y="574" class="muted">Decision recorded to overlay · event appended: gate.approved (SIMULATED)</text>
+  <text x="276" y="594" class="muted">No real Linear write performed. Reversible locally.</text>
+  <rect x="990" y="526" width="398" height="84" rx="6" fill="#1c232c"/>
+  <text x="1006" y="552" class="muted" font-weight="700">Event log</text>
+  <rect x="1006" y="562" width="366" height="36" rx="6" fill="rgba(216,178,113,0.14)"/><text x="1018" y="585" fill="#d8b271" font-size="11" font-weight="600">SIMULATED · gate.approved · deploy (no real action)</text>
+
+  <!-- eval gates -->
+  <rect x="244" y="650" width="1164" height="100" rx="8" fill="#151a21" stroke="#2b3543"/>
+  <text x="262" y="680" class="h2">Eval hard gates (read-only)</text>
+  <text x="262" y="706" class="muted">engineering: unit_tests_pass ✓ · diff_check_clean ✓ · no_secret_leakage ✓ — from packages/weave-tool/evals/lifecycle/*.yaml</text>
+  <text x="262" y="730" class="muted">these advance/block stage transitions automatically; not owner-approvable</text>
+
+  <text x="244" y="790" class="muted">Hi-fi mockup · the screen carrying the MVP's required owner action (Approve / Hold) with the SIMULATED boundary explicit.</text>
+</svg>
