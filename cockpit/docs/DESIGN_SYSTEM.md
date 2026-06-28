@@ -85,14 +85,29 @@ Owner actions (Approve, Hold, Mark ready-for-review, Post note, Acknowledge). Pr
 ### 5.9 App Shell `<Shell>`
 `--nav-w` left nav (brand + 7 destinations, active = accent on `--bg-2`) + BoundaryBanner + content area padded `--content-pad`. Every route renders inside it.
 
+### 5.10 Feedback states — `<EmptyState>` / `<LoadingSkeleton>` / `<ErrorPanel>`
+The three non-populated states every data screen needs (per-screen copy is specified in [WIREFRAMES.md §5](WIREFRAMES.md)). All three are token-driven and carry **no semantic/status color** — they must never be mistaken for an attention state.
+- **EmptyState** — centered single line on `--bg-1`, `--text-2` muted, optional one-line route hint. Example: "All clear — nothing needs you." Never an error tone.
+- **LoadingSkeleton** — greyed placeholder rows/cards using `--bg-2` blocks at ~50% on `--bg-1`; **no spinner** (reads are local + synchronous-feeling). Mirrors the real layout's row/card shape so there's no reflow jump.
+- **ErrorPanel** — bordered panel, `--border-strong`, `--text-1` body with a muted secondary line pointing to Settings. **Safe by construction:** shows the `<cockpit>/fixtures/…` placeholder path only — never a real user home path, secret, or raw stack trace. Uses neutral chrome, not `--attn-blocked`, so a read failure is never confused with a WEAVE "blocked" state.
+
 ---
 
 ## 6. States & interaction notes
 - **Hover:** rows lift to `--bg-3`; cards raise `--shadow-1`.
 - **Active route:** nav item accent text + `--bg-2` fill.
 - **Clickable attention:** Command Center rows and KPI tiles are filters → navigate to the filtered Gate/Mission/Room view.
-- **Empty states:** muted single-line "Nothing here" with the relevant route hint.
+- **Empty / loading / error:** see §5.10 — empty = muted single line + route hint; loading = layout-matched skeleton (no spinner); error = neutral panel pointing to Settings, never status-colored, never leaking paths/secrets.
 - **Density:** default compact; one width (desktop, ≥1280). No mobile in MVP scope.
+
+## 6a. Iconography & asset policy
+Source/tool identities (WEAVE, Linear, Slack, GitHub, and the runtimes Codex / Claude / Local runtime) are rendered as **text wordmarks / labels with a small monochrome glyph slot**, not fetched brand logos. This is a deliberate constraint, not an omission:
+- **Local-only / no network:** the cockpit makes no outbound calls (brief §A4), so it ships **no remote logo assets**; identities stay as in-repo text.
+- **Runtime naming:** runtimes are labeled `Codex`, `Claude`, `Local runtime`. The legacy example runtime name listed in ATM-385 is intentionally **not used** — the repo's `public_safe_repo_scan.py` blocks it as a legacy surface (brief §8 / Q2). This is the one ATM-385 asset the design knowingly substitutes.
+- Mirror/Courier tools (Linear/Slack/GitHub) always appear **with the Mirror/Courier badge**, never as a bare logo, so a tool icon is never mistaken for source-of-truth.
+
+## 6b. Hi-fi coverage & deferred screens
+Hi-fi mockups are delivered for the **two screens that carry the demo's decision weight**: Command Center (the attention hub) and the Gate / Approval Queue (the owner action). **Screens 2–6, 8, 9 (Rooms, Missions, Proof Ledger, Runtime, Settings) are deliberately deferred at hi-fi** — they are **not dropped**: their low-fi wireframes ([WIREFRAMES.md](WIREFRAMES.md)) plus the tokens and component specs in this document are the build spec, and they inherit the exact same Shell, palette, and components proven in the two hi-fi targets. ATM-386 builds all 9 against `tokens.css`; hi-fi for the deferred screens, if wanted, is a fast follow once the components exist in code.
 
 ## 7. Mapping back to the build (ATM-386)
 `tokens.css` imports first; components in §5 become files in `cockpit/components/`; screens in [WIREFRAMES.md](WIREFRAMES.md) §1 become `app/**/page.tsx`. The hi-fi mockups in `assets/mockups/` are the visual target for Command Center and the Gate Queue (the action screen).

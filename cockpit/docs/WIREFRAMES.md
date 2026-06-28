@@ -72,3 +72,25 @@ Derivation rules are defined in the brief §3.3 and implemented test-first in `l
 **6 · Runtime panel** — runtime list (Codex / Claude / Local runtime) with health/checkpoint + attached mission + latest status; selected-runtime detail (blocker/input request + status history); "Leave a note (local-only)" composer.
 
 **7 · Settings** — data-source toggle (Fixture vs Live local home, with resolved path placeholder); proof-boundary panel; Mirrors/Couriers panel (Linear/Slack/GitHub = reflects state, never source of truth; shown disconnected/simulated); "WEAVE 0.2 — draft, not final" note.
+
+---
+
+## 5. Per-screen states & primary owner question
+
+The low-fi SVGs show each screen's **populated + blocked** state (blocked is the operative one for the demo). This table defines the remaining required states — **primary owner question, empty, loading, error** — for all 9 screens so the build (ATM-386) has them specified.
+
+Two conventions keep these honest and local-only:
+- **Loading is brief and synchronous-feeling** — the cockpit reads local JSON, so loading = a short skeleton (greyed rows/cards), never a spinner waiting on a network call.
+- **Error never leaks** — a read/parse failure shows a safe message + a pointer to Settings; it never prints secrets, raw stack traces, or a real user home path (only the `<cockpit>/fixtures/…` placeholder).
+
+| Screen | Primary owner question | Empty | Loading | Error | Blocked |
+|---|---|---|---|---|---|
+| **1 Command Center** | "What needs me right now, across everything?" | "All clear — nothing needs you" (None pill, KPI zeros) | KPI + attention-list skeleton rows | "Couldn't read WEAVE home — check the data source in Settings" banner; nav stays usable | blocked items pinned to top of the attention list (red pill); reflected in the Blocked KPI |
+| **2 Room List** | "What are all my apps and which need me?" | "No Rooms yet — bootstrap an app to begin" | table skeleton | per-row "Couldn't parse `app.json` for `<id>`"; other rows still render | Room shows Blocked pill; attention filter → Blocked |
+| **3 Room Detail** | "Why is this app in its state and what's the safe next move?" | "No missions/proof recorded for this Room yet" | stage-rail + panels skeleton | "Room `<id>` not found or unreadable" → link back to Room List | stage rail marks the blocked stage (dashed/⚠); Blockers panel shows `state` + `missing[]` + `next_action` |
+| **4 Mission Board** | "What bounded work is in flight and where is it stuck?" | "No open missions" | column-card skeletons | per-column "Couldn't read tasks for `<room>`" | blocked missions carry the Blocked pill in their status column |
+| **5 Mission Detail** | "What's the objective/scope/proof, and may I act?" | "Proof status: missing" + empty evidence checklist | skeleton | "Mission `<id>` not found" | Blocked pill + the forbidden-action reason; the local action is disabled with that reason shown |
+| **6 Proof Ledger** | "For any claim, what's the evidence and what does it NOT prove?" | "No proof envelopes recorded yet" | envelope-list + event-log skeleton | "Couldn't read proof tray / `events.jsonl`" | a gate-blocked claim still renders its **non-claims**; `SIMULATED` events stay visually separated from real proof |
+| **7 Gate / Approval Queue** | "What needs my approval, at what risk, and what happens if I approve?" | "No gates awaiting you — nothing to approve" | gate-card skeleton | "Couldn't read `deployment-gates.json`" | gate shown `blocked_until_validated` w/ per-provider `not_validated`; **Approve writes a local overlay + `SIMULATED` event — the external effect is never executed** |
+| **8 Runtime / Agent** | "Are my agents alive, where are they, and what are they waiting on?" | "No runtimes attached" | runtime-list skeleton | "Couldn't read worker orchestration" | runtime in `awaiting input` state surfaces the open input-request; "Post note" is local-only |
+| **9 Settings** | "Where is my data coming from, and what is / isn't proven?" | n/a — always shows source + boundary | "Resolving home path…" | "Configured home path not found — falling back to fixture" + how to fix | n/a |
