@@ -26,12 +26,12 @@ From ATM-383 non-goals + the repo's own contracts:
 
 ### Repo CI scanners that will block the build (design around these now)
 Two scripts run in CI (`.github/workflows/public-safe-ci.yml`) and scan every tracked `.py/.js/.ts/.tsx/.html/.css/.json/.md/...` file:
-- `scripts/public_safe_repo_scan.py` flags **`localhost`, `127.0.0.1`, `host.docker.internal`** (loopback-host) and the words **`Hermes`, `Telegram`, `Textual`, `TUI`, `Symphony`** (legacy-surface), plus private paths/IPs/keys.
+- `scripts/public_safe_repo_scan.py` flags loopback host strings (the `loopback-host` label) and a set of legacy-surface product/runtime names (the `legacy-surface` label) — see the `PATTERNS` list in that script for the exact terms — plus private paths/IPs/keys. **Note: this very doc must avoid spelling those terms or it fails its own scanner.**
 - `scripts/check_no_secrets.py` flags API keys, tokens, private keys, wallet addresses.
 
 Consequences for the cockpit:
-- **Runtime fixtures must not use the name "Hermes."** Use `Codex`, `Claude`, and `Local runtime` as the runtime/worker identities (ATM-383's primitive list says "such as Hermes" — we substitute safe names).
-- Do **not** commit the strings `localhost`/`127.0.0.1` in source or README. The `next dev` terminal printing `localhost:3000` at runtime is fine (not a committed string). If a committed file genuinely needs a loopback reference, add a **scoped allowlist entry** in `scripts/public_safe_repo_scan.py` (it supports `ALLOWLIST_LINE_PATTERNS` keyed by path+label+regex) rather than obfuscating.
+- **Runtime fixtures must not use the legacy runtime name ATM-383 lists as an example.** Use `Codex`, `Claude`, and `Local runtime` as the runtime/worker identities — we substitute scanner-safe names.
+- Do **not** commit loopback host strings (the ones the scanner flags) in source or README. The dev server printing its loopback URL at runtime is fine (not a committed string). If a committed file genuinely needs a loopback reference, add a **scoped allowlist entry** in `scripts/public_safe_repo_scan.py` (it supports `ALLOWLIST_LINE_PATTERNS` keyed by path+label+regex) rather than obfuscating.
 - Gitignore `cockpit/node_modules/` and `cockpit/.next/` so dependencies/build output are never committed or scanned.
 - All generated/owner-action state writes go under gitignored `runs/` so they are never committed or scanned.
 
@@ -109,7 +109,7 @@ WEAVE 0.2 vocabulary maps onto data that already exists in this repo (verified i
 | Home / Castle | `runs/cos-weave-home/state.json`, `owner-profile.json`, `updates/readback.json` | Command Center |
 | Room / App Workspace | `apps/<id>/app.json`, `apps/registry.json`, `lifecycle.json` (11 stages) | Room List / Room Detail |
 | Mission / bounded work packet | `tasks.json` + `worker-packets/WP-*.md` (objective, scope, forbidden actions, review loop) | Mission Board / Mission Detail |
-| Runtime / worker | `worker_orchestration` + task assignment (label as Codex / Claude / Local runtime — **not Hermes**) | Runtime/Agent panel |
+| Runtime / worker | `worker_orchestration` + task assignment (label as Codex / Claude / Local runtime — **not the blocked legacy runtime term**) | Runtime/Agent panel |
 | Proof Envelope | `proof/proof-tray.json` (`claim`, `proof_surface`, `artifact_refs`, `review_loop_state`, `non_claims`) | Proof / Evidence Ledger |
 | Gate / Approval Queue | `deployment-gates.json` (providers, capabilities, `forbidden_until_validated`) + eval hard gates in `packages/weave-tool/evals/lifecycle/*.yaml` | Gate / Approval Queue |
 | Event Log / Proof Ledger | `updates/readback.json` history + an append-only `updates/events.jsonl` we maintain for owner actions | Proof Ledger / activity |
@@ -149,7 +149,7 @@ Write `cockpit/docs/PRODUCT_INGREDIENTS_BRIEF.md` containing:
 - **Domain object + state model** (the mapping table above + the Owner Attention state rules + lifecycle/review-loop enums).
 - **Screen inventory + information architecture** (the 7 areas + nav/route map).
 - **Workflow map** for the demo journey (Command Center → Room → Mission → Proof/Gate → approve).
-- **Assumptions + open questions** (e.g. confirm "Hermes" substitution; confirm whether live `runs/` mode is in scope this week).
+- **Assumptions + open questions** (e.g. confirm the runtime-name substitution; confirm whether live `runs/` mode is in scope this week).
 - Link the brief back to ATM-384.
 
 ### Tue 2026-06-30 — [ATM-385](https://linear.app/atumera-llc/issue/ATM-385): screen map + wireframes (part 1)
@@ -178,7 +178,7 @@ Write `cockpit/docs/PRODUCT_INGREDIENTS_BRIEF.md` containing:
 
 ## Reuse (don't reinvent)
 - Read state shapes from the working engine `scripts/weave_cos_skeleton.py` and the committed sample `docs/samples/cos-weave-skeleton/` — the cockpit consumes the **same JSON schemas** (`weave-cos-app/v0.1`, `weave-cos-lifecycle/v0.1`, `weave-cos-proof-tray/v0.1`, `weave-deployment-gates/v0.1`, etc.); do not invent a parallel model.
-- Use exact contract vocabulary for labels (stage names, `ACCEPT_FOR_SCOPE`/`REVISE`/`BLOCKED`/`NEEDS_OWNER_ACTION`, review-loop steps) so the UI is faithful to the system.
+- Use exact contract vocabulary for labels (stage names, `ACCEPT_FOR_SCOPE`/`REVISE`/`BLOCKED`/`NEEDS_OWNER_ACTION`, review-loop steps) so the UI is faithful to the system — except runtime names, which use scanner-safe substitutes.
 - Generate the expanded fixture by running `bin/weave cos-bootstrap` for multiple intents, then hand-editing states — rather than authoring JSON from scratch.
 
 ## Verification (end-to-end)
@@ -186,11 +186,11 @@ Write `cockpit/docs/PRODUCT_INGREDIENTS_BRIEF.md` containing:
 2. `npm run dev` → Claude drives the app via browser MCP (fixture home is the default).
 3. Walk the journey: Command Center shows an "approval required" item → open its Room → open the Mission → view the Proof/Gate → click **Approve (local-only)** → confirmation shows, `events.jsonl` records a `SIMULATED` external effect. Screenshot each step.
 4. Refresh and restart the dev server → the approval state persists (overlay file).
-5. Confirm Settings screen shows fixture-vs-live + local-only boundary; confirm no runtime is named "Hermes".
+5. Confirm Settings screen shows fixture-vs-live + local-only boundary; confirm no runtime uses the blocked legacy runtime term.
 6. Run the repo CI gates (`check_no_secrets.py`, `public_safe_repo_scan.py`, `unittest` discover, `git diff --check`); all pass.
 
 ## Open questions to confirm with George (raise Monday in ATM-384)
 - OK to add an **isolated Node/Next.js toolchain** under `cockpit/` (core WEAVE stays zero-dependency Python; `node_modules`/`.next` gitignored)?
-- OK to substitute `Codex/Claude/Local runtime` for "Hermes" in committed fixtures (required to pass `public_safe_repo_scan.py`)?
+- OK to substitute `Codex/Claude/Local runtime` for the example runtime name ATM-383 lists in committed fixtures (required to pass `public_safe_repo_scan.py`)?
 - Is pointing the cockpit at a real `runs/cos-weave-home/` ("live mode") in scope this week, or fixture-only acceptable for the MVP?
 - Is committing the cockpit under a new top-level `cockpit/` folder (vs `packages/`) acceptable for repo layout?
