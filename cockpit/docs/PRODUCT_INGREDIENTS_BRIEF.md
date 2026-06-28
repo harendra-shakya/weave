@@ -1,7 +1,7 @@
 # WEAVE 0.2 — Product Ingredients Brief (Local Owner Cockpit)
 
 > Deliverable for **[ATM-384](https://linear.app/atumera-llc/issue/ATM-384/weave-02-product-ingredients-user-stories-for-local-owner-cockpit)**.
-> Status: **v1 draft** (sprint Mon 2026-06-29). Prerequisite for wireframes (ATM-385) and build (ATM-386).
+> Status: **v2 — checklist-complete** (sprint Mon 2026-06-29). Prerequisite for wireframes (ATM-385) and build (ATM-386).
 > This brief converts WEAVE 0.2 draft context into concrete UI ingredients **grounded in data that already exists in this repo** — it does not invent a new model. Every primitive below is mapped to a real schema and file verified in `scripts/weave_cos_skeleton.py` and the committed sample `docs/samples/cos-weave-skeleton/`.
 
 ---
