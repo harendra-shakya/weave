@@ -1,0 +1,6 @@
+{"schema": "weave-cos-event/v0.1", "app_id": "tiny-local-calculator", "at": "2026-06-29T09:02:00Z", "event": "proof.recorded", "intent": "engineering proof recorded", "state": "recorded"}
+{"schema": "weave-cos-event/v0.1", "app_id": "habit-tracker", "at": "2026-06-29T08:59:00Z", "event": "proof.recorded", "intent": "engineering proof recorded", "state": "recorded"}
+{"schema": "weave-cos-event/v0.1", "app_id": "habit-tracker", "at": "2026-06-29T08:30:00Z", "event": "gate.opened", "intent": "connect Linear write access", "state": "awaiting_owner_approval"}
+{"schema": "weave-cos-event/v0.1", "app_id": "receipts-app", "at": "2026-06-29T08:21:00Z", "event": "blocker.opened", "intent": "deployment provider access not validated", "state": "blocked_until_validated"}
+{"schema": "weave-cos-event/v0.1", "app_id": "receipts-app", "at": "2026-06-29T08:05:00Z", "event": "stage.advanced", "intent": "entered deployment stage", "state": "active"}
+{"schema": "weave-cos-event/v0.1", "app_id": "notes-app", "at": "2026-06-28T17:40:00Z", "event": "cos_bootstrap.app_recorded", "intent": "build a local notes app", "state": "local_skeleton_ready"}

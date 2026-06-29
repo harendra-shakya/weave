@@ -1,0 +1,15 @@
+{
+  "schema": "weave-cos-blocker-tray/v0.1",
+  "app_id": "receipts-app",
+  "blockers": [
+    {
+      "id": "deployment-provider-access-not-validated",
+      "state": "blocked_until_validated",
+      "missing": [
+        { "provider": "cloudflare", "proof_state": "not_validated" },
+        { "provider": "vercel", "proof_state": "not_validated" }
+      ],
+      "next_action": "continue local prep; block deployment/launch until provider access is validated through connector/MCP/brokered access proof"
+    }
+  ]
+}

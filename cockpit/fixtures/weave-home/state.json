@@ -1,0 +1,18 @@
+{
+  "schema": "weave-cos-skeleton/v0.1",
+  "active_app_id": "receipts-app",
+  "app_count": 4,
+  "state": "local_skeleton_ready",
+  "surface": "codex",
+  "review_loop": ["observe", "validate", "govern", "review", "sync"],
+  "non_claims": [
+    "does not prove public deployment, billing, or public send",
+    "does not prove live tracker or Linear mutation",
+    "does not prove full lifecycle completion",
+    "does not access credentials or secret values"
+  ],
+  "standard_home": "runs/cos-weave-home",
+  "updated_at": "2026-06-29T09:10:00Z",
+  "_fixture": true,
+  "_fixture_note": "Demo home for the WEAVE Owner Cockpit (ATM-386). Not a real runs/ home. Runtimes are Codex / Claude / Local runtime."
+}

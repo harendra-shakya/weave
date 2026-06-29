@@ -1,0 +1,11 @@
+{
+  "schema": "weave-cos-app-registry/v0.1",
+  "active_app_id": "receipts-app",
+  "apps": [
+    { "app_id": "receipts-app", "name": "Receipts App", "current_stage": "deployment", "state": "deployment_blocked_until_provider_access_validated", "readback_ref": "apps/receipts-app/updates/readback.json" },
+    { "app_id": "habit-tracker", "name": "Habit Tracker", "current_stage": "engineering", "state": "awaiting_owner_approval", "readback_ref": "apps/habit-tracker/updates/readback.json" },
+    { "app_id": "tiny-local-calculator", "name": "Calculator", "current_stage": "qa", "state": "engineering_proof_recorded", "readback_ref": "apps/tiny-local-calculator/updates/readback.json" },
+    { "app_id": "notes-app", "name": "Notes App", "current_stage": "selection", "state": "local_skeleton_ready", "readback_ref": "apps/notes-app/updates/readback.json" }
+  ],
+  "updated_at": "2026-06-29T09:10:00Z"
+}

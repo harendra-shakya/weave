@@ -1,0 +1,15 @@
+{
+  "schema": "weave-cos-proof-tray/v0.1",
+  "items": [
+    {
+      "app_id": "tiny-local-calculator",
+      "task_id": "TASK-0007",
+      "claim": "Calculator core arithmetic implemented and unit-tested locally",
+      "proof_surface": "TOOL_VERIFIED_LOCAL",
+      "artifact_refs": ["apps/tiny-local-calculator/app.json", "apps/tiny-local-calculator/lifecycle.json", "apps/tiny-local-calculator/worker-packets/WP-0007.md"],
+      "non_claims": ["does not prove deployment", "does not prove live tracker/Linear mutation", "does not prove billing/public send", "does not access credentials or secret values"],
+      "review_loop_state": { "observe": "recorded", "validate": "pending", "govern": "hard_gates_recorded", "review": "pending", "sync": "readback_written" },
+      "state": "recorded"
+    }
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "schema": "weave-cos-app/v0.1",
+  "app_id": "tiny-local-calculator",
+  "name": "Calculator",
+  "owner_intent": "build a tiny local calculator app",
+  "current_stage": "qa",
+  "requested_stage": "qa",
+  "state": "engineering_proof_recorded",
+  "next_action": "owner review of recorded engineering proof before QA proceeds",
+  "missing_gates": [],
+  "tracker": { "mode": "local", "linear_required": false, "message": "Local WEAVE task ledger is authoritative." },
+  "worker_orchestration": { "mode": "local_packet_recorded" },
+  "non_claims": ["does not prove deployment, billing, or public send", "does not prove live tracker or Linear mutation", "does not prove full lifecycle completion", "does not access credentials or secret values"],
+  "updated_at": "2026-06-29T09:02:00Z"
+}

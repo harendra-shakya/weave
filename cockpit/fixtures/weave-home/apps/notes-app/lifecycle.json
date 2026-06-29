@@ -1,0 +1,20 @@
+{
+  "schema": "weave-cos-lifecycle/v0.1",
+  "app_id": "notes-app",
+  "current_stage": "selection",
+  "requested_stage": "selection",
+  "stages": [
+    { "stage": "intent", "label": "Intent", "state": "complete", "proof_state": "recorded" },
+    { "stage": "research", "label": "Research", "state": "complete", "proof_state": "recorded" },
+    { "stage": "selection", "label": "Selection", "state": "active", "proof_state": "missing" },
+    { "stage": "plan", "label": "Plan", "state": "not_started", "proof_state": "not_required_yet" },
+    { "stage": "engineering", "label": "Engineering", "state": "not_started", "proof_state": "not_required_yet" },
+    { "stage": "qa", "label": "QA", "state": "not_started", "proof_state": "not_required_yet" },
+    { "stage": "deployment", "label": "Deployment", "state": "not_started", "proof_state": "not_required_yet" },
+    { "stage": "kpi-setup", "label": "KPI Setup", "state": "not_started", "proof_state": "not_required_yet" },
+    { "stage": "marketing", "label": "Marketing", "state": "not_started", "proof_state": "not_required_yet" },
+    { "stage": "iteration", "label": "Iteration", "state": "not_started", "proof_state": "not_required_yet" },
+    { "stage": "analysis", "label": "Analysis", "state": "not_started", "proof_state": "not_required_yet" }
+  ],
+  "updated_at": "2026-06-28T17:40:00Z"
+}

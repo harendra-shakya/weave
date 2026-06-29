@@ -1,0 +1,27 @@
+{
+  "schema": "weave-cos-app/v0.1",
+  "app_id": "receipts-app",
+  "name": "Receipts App",
+  "owner_intent": "build a local receipts capture + export app",
+  "current_stage": "deployment",
+  "requested_stage": "deployment",
+  "state": "deployment_blocked_until_provider_access_validated",
+  "next_action": "validate provider access via connector/MCP before deploy; continue local packet prep",
+  "missing_gates": ["Deployment provider access is not validated"],
+  "tracker": { "mode": "local", "linear_required": false, "message": "Local WEAVE task ledger is authoritative until a tracker is connected and approved." },
+  "worker_orchestration": { "mode": "local_packet_recorded" },
+  "deployment_gates": {
+    "schema": "weave-deployment-gates/v0.1",
+    "state": "deployment_blocked_until_provider_access_validated",
+    "launch_allowed": false,
+    "local_progress_allowed": true,
+    "blocked_by_provider_access": true,
+    "providers": [
+      { "provider": "cloudflare", "proof_state": "not_validated", "required_capabilities": ["domain_authority", "dns_zone_read_access", "dns_record_write_authority", "cname_control", "subdomain_control"] },
+      { "provider": "vercel", "proof_state": "not_validated", "required_capabilities": ["hosting_project_access", "deployment_target_access", "production_environment_access", "domain_alias_control"] }
+    ],
+    "non_claims": ["does not prove provider account access", "does not prove DNS or domain authority", "does not prove DNS mutation", "does not request or store raw secrets"]
+  },
+  "non_claims": ["does not prove public deployment, billing, or public send", "does not prove live tracker or Linear mutation", "does not prove full lifecycle completion", "does not access credentials or secret values"],
+  "updated_at": "2026-06-29T09:05:00Z"
+}

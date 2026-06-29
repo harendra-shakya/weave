@@ -1,0 +1,21 @@
+{
+  "schema": "weave-cos-task-ledger/v0.1",
+  "tasks": [
+    {
+      "schema": "weave-cos-task/v0.1",
+      "app_id": "tiny-local-calculator",
+      "task_id": "TASK-0007",
+      "stage": "engineering",
+      "state": "awaiting_review",
+      "objective": "Implement and unit-test calculator core arithmetic locally.",
+      "worker_packet_ref": "apps/tiny-local-calculator/worker-packets/WP-0007.md",
+      "review_loop": ["observe", "validate", "govern", "review", "sync"],
+      "runtime": "Claude",
+      "due": "2026-06-30",
+      "proof_state": "recorded",
+      "allowed": ["public-safe repo files", "local WEAVE skeleton state", "public docs & tests"],
+      "forbidden": ["deployment without approval", "real external sends / tracker writes", "raw secrets / credentials"],
+      "non_claims": ["does not prove deployment", "does not prove full-lifecycle completion"]
+    }
+  ]
+}

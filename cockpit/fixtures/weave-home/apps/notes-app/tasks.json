@@ -1,0 +1,21 @@
+{
+  "schema": "weave-cos-task-ledger/v0.1",
+  "tasks": [
+    {
+      "schema": "weave-cos-task/v0.1",
+      "app_id": "notes-app",
+      "task_id": "TASK-0031",
+      "stage": "selection",
+      "state": "in_progress",
+      "objective": "Select the notes-app approach and record selection-stage proof.",
+      "worker_packet_ref": "apps/notes-app/worker-packets/WP-0031.md",
+      "review_loop": ["observe", "validate", "govern", "review", "sync"],
+      "runtime": "Local runtime",
+      "due": "2026-07-03",
+      "proof_state": "missing",
+      "allowed": ["public-safe repo files", "local WEAVE skeleton state"],
+      "forbidden": ["deployment without approval", "real external sends", "raw secrets / credentials"],
+      "non_claims": ["does not prove selection completion", "does not prove full-lifecycle completion"]
+    }
+  ]
+}

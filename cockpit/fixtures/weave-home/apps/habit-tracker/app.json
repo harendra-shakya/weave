@@ -1,0 +1,15 @@
+{
+  "schema": "weave-cos-app/v0.1",
+  "app_id": "habit-tracker",
+  "name": "Habit Tracker",
+  "owner_intent": "build a local habit tracking app",
+  "current_stage": "engineering",
+  "requested_stage": "engineering",
+  "state": "awaiting_owner_approval",
+  "next_action": "owner approval required to connect Linear write access (mirror) before the runtime mirrors status outward",
+  "missing_gates": [],
+  "tracker": { "mode": "local", "linear_required": false, "message": "Linear is a Mirror — never the source of truth. Connection is simulated until approved." },
+  "worker_orchestration": { "mode": "local_packet_recorded" },
+  "non_claims": ["does not prove live tracker or Linear mutation", "does not prove public deployment, billing, or public send", "does not prove full lifecycle completion", "does not access credentials or secret values"],
+  "updated_at": "2026-06-29T09:00:00Z"
+}

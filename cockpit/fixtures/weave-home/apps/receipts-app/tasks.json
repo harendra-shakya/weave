@@ -1,0 +1,34 @@
+{
+  "schema": "weave-cos-task-ledger/v0.1",
+  "tasks": [
+    {
+      "schema": "weave-cos-task/v0.1",
+      "app_id": "receipts-app",
+      "task_id": "TASK-0011",
+      "stage": "deployment",
+      "state": "blocked",
+      "objective": "Assemble a deploy packet and identify the exact owner approval needed for production.",
+      "worker_packet_ref": "apps/receipts-app/worker-packets/WP-0011.md",
+      "review_loop": ["observe", "validate", "govern", "review", "sync"],
+      "runtime": "Codex",
+      "due": "2026-07-02",
+      "proof_state": "missing",
+      "allowed": ["public-safe repo files", "local WEAVE skeleton state", "deterministic procedure prompts", "public docs & tests"],
+      "forbidden": ["production deploy without approval", "real external sends / tracker writes", "raw secrets / credentials", "claiming full-lifecycle completion"],
+      "non_claims": ["does not prove deployment", "does not prove live tracker mutation", "does not prove billing", "does not prove full-lifecycle completion"]
+    },
+    {
+      "schema": "weave-cos-task/v0.1",
+      "app_id": "receipts-app",
+      "task_id": "TASK-0012",
+      "stage": "engineering",
+      "state": "done_for_scope",
+      "objective": "Wire receipt export locally.",
+      "worker_packet_ref": "apps/receipts-app/worker-packets/WP-0012.md",
+      "review_loop": ["observe", "validate", "govern", "review", "sync"],
+      "runtime": "Claude",
+      "due": "2026-07-01",
+      "proof_state": "recorded"
+    }
+  ]
+}

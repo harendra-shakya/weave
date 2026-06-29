@@ -1,0 +1,43 @@
+{
+  "schema": "weave-cockpit-runtimes/v0.1",
+  "_fixture": true,
+  "runtimes": [
+    {
+      "identity": "Codex",
+      "health": "healthy",
+      "status": "planning Receipts deploy packet",
+      "mission_ref": "TASK-0011",
+      "app_id": "receipts-app",
+      "at": "2026-06-29T09:06:00Z",
+      "input_request": "Which deploy target should I prepare the packet for? Provider access is not yet validated.",
+      "history": [
+        { "at": "2026-06-29T09:06:00Z", "note": "raised input request (deploy target)" },
+        { "at": "2026-06-29T08:51:00Z", "note": "drafted deploy packet outline (local)" },
+        { "at": "2026-06-29T08:39:00Z", "note": "loaded stage-entry contract (deployment)" }
+      ]
+    },
+    {
+      "identity": "Claude",
+      "health": "healthy",
+      "status": "engineering Habit Tracker",
+      "mission_ref": "TASK-0021",
+      "app_id": "habit-tracker",
+      "at": "2026-06-29T08:59:00Z",
+      "history": [
+        { "at": "2026-06-29T08:59:00Z", "note": "recorded engineering proof (local)" },
+        { "at": "2026-06-29T08:30:00Z", "note": "opened gate: connect Linear write access" }
+      ]
+    },
+    {
+      "identity": "Local runtime",
+      "health": "idle",
+      "status": "awaiting owner input",
+      "mission_ref": "TASK-0021",
+      "app_id": "habit-tracker",
+      "at": "2026-06-29T08:48:00Z",
+      "history": [
+        { "at": "2026-06-29T08:48:00Z", "note": "idle — no active mission assigned" }
+      ]
+    }
+  ]
+}

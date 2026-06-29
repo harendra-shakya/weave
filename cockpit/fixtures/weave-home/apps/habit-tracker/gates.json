@@ -1,0 +1,18 @@
+{
+  "schema": "weave-cockpit-gates/v0.1",
+  "_fixture": true,
+  "gates": [
+    {
+      "id": "habit-tracker__connect-linear-write",
+      "app_id": "habit-tracker",
+      "action": "Connect Linear write access (mirror)",
+      "blast_radius": "MEDIUM",
+      "requires_owner_approval": true,
+      "launch_allowed": true,
+      "blocked_by_provider_access": false,
+      "providers": [],
+      "mirror": "Linear",
+      "non_claims": ["does not perform a real Linear write", "Linear is a Mirror — never the source of truth", "records a local owner decision + a SIMULATED event only", "reversible locally"]
+    }
+  ]
+}

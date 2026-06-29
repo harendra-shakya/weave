@@ -1,0 +1,20 @@
+{
+  "schema": "weave-cockpit-gates/v0.1",
+  "_fixture": true,
+  "gates": [
+    {
+      "id": "receipts-app__deploy-to-production",
+      "app_id": "receipts-app",
+      "action": "Deploy Receipts App to production",
+      "blast_radius": "HIGH",
+      "requires_owner_approval": true,
+      "launch_allowed": false,
+      "blocked_by_provider_access": true,
+      "providers": [
+        { "provider": "cloudflare", "proof_state": "not_validated", "required_capabilities": ["domain_authority", "dns_record_write_authority", "cname_control"] },
+        { "provider": "vercel", "proof_state": "not_validated", "required_capabilities": ["hosting_project_access", "deployment_target_access", "production_environment_access"] }
+      ],
+      "non_claims": ["does not prove provider account access", "does not perform DNS mutation", "does not store raw secrets", "records a local owner decision + a SIMULATED event only"]
+    }
+  ]
+}

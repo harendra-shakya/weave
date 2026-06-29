@@ -1,0 +1,15 @@
+{
+  "schema": "weave-cos-app/v0.1",
+  "app_id": "notes-app",
+  "name": "Notes App",
+  "owner_intent": "build a local notes app",
+  "current_stage": "selection",
+  "requested_stage": "selection",
+  "state": "local_skeleton_ready",
+  "next_action": "record selection-stage proof or confirm direction; stage has been idle with no proof",
+  "missing_gates": ["Selection gate is not complete"],
+  "tracker": { "mode": "local", "linear_required": false, "message": "Local WEAVE task ledger is authoritative." },
+  "worker_orchestration": { "mode": "local_packet_recorded" },
+  "non_claims": ["does not prove deployment, billing, or public send", "does not prove live tracker or Linear mutation", "does not prove full lifecycle completion", "does not access credentials or secret values"],
+  "updated_at": "2026-06-28T17:40:00Z"
+}

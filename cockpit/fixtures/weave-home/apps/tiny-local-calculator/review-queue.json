@@ -1,0 +1,13 @@
+{
+  "schema": "weave-cos-review-queue/v0.1",
+  "app_id": "tiny-local-calculator",
+  "items": [
+    {
+      "id": "review-calculator-engineering",
+      "artifact_refs": ["apps/tiny-local-calculator/worker-packets/WP-0007.md"],
+      "decision": "not_accepted_as_done",
+      "loop": ["observe", "validate", "govern", "review", "sync"],
+      "state": "pending_owner_context"
+    }
+  ]
+}

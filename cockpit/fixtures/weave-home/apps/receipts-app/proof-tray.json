@@ -1,0 +1,15 @@
+{
+  "schema": "weave-cos-proof-tray/v0.1",
+  "items": [
+    {
+      "app_id": "receipts-app",
+      "task_id": "TASK-0012",
+      "claim": "Receipt export wired locally",
+      "proof_surface": "TOOL_VERIFIED_LOCAL",
+      "artifact_refs": ["apps/receipts-app/app.json", "apps/receipts-app/lifecycle.json"],
+      "non_claims": ["does not prove deployment", "does not prove live tracker mutation", "does not prove billing or public send"],
+      "review_loop_state": { "observe": "recorded", "validate": "recorded", "govern": "hard_gates_recorded", "review": "recorded", "sync": "readback_written" },
+      "state": "recorded"
+    }
+  ]
+}

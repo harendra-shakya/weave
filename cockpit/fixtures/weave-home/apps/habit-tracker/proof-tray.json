@@ -1,0 +1,15 @@
+{
+  "schema": "weave-cos-proof-tray/v0.1",
+  "items": [
+    {
+      "app_id": "habit-tracker",
+      "task_id": "TASK-0021",
+      "claim": "Habit Tracker engineering scaffolding implemented locally",
+      "proof_surface": "TOOL_VERIFIED_LOCAL",
+      "artifact_refs": ["apps/habit-tracker/app.json", "apps/habit-tracker/lifecycle.json"],
+      "non_claims": ["does not prove live Linear mutation", "does not prove deployment", "does not prove billing or public send"],
+      "review_loop_state": { "observe": "recorded", "validate": "recorded", "govern": "hard_gates_recorded", "review": "recorded", "sync": "readback_written" },
+      "state": "recorded"
+    }
+  ]
+}
