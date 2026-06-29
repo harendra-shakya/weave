@@ -1,0 +1,28 @@
+{
+  "name": "weave-owner-cockpit",
+  "version": "0.2.0",
+  "private": true,
+  "description": "WEAVE 0.2 local owner cockpit — read-and-act UI over the local WEAVE home (ATM-386). Local-only; external effects simulated.",
+  "scripts": {
+    "dev": "next dev",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "next": "14.2.5",
+    "react": "18.3.1",
+    "react-dom": "18.3.1"
+  },
+  "devDependencies": {
+    "@testing-library/jest-dom": "6.4.8",
+    "@testing-library/react": "16.0.0",
+    "@types/node": "20.14.15",
+    "@types/react": "18.3.3",
+    "@types/react-dom": "18.3.0",
+    "@vitejs/plugin-react": "4.3.1",
+    "jsdom": "24.1.1",
+    "typescript": "5.5.4",
+    "vitest": "2.0.5"
+  }
+}

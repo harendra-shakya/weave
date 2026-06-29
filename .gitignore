@@ -8,6 +8,12 @@ __pycache__/
 node_modules/
 dist/
 build/
+.next/
+next-env.d.ts
+*.tsbuildinfo
+# cockpit lockfile: deps are pinned to exact versions in package.json; the
+# lockfile trips the public-safe scanner on transitive semver like "10.0.0".
+cockpit/package-lock.json
 runs/
 evidence/
 .workflow/
