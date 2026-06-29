@@ -2,10 +2,11 @@ import { describe, it, expect } from "vitest";
 import path from "node:path";
 import { loadHome } from "./weaveHome";
 import { emptyOverlay } from "./overlay";
+import type { Room } from "./types";
 
 const FIXTURE = path.join(process.cwd(), "fixtures", "weave-home");
 
-function roomById(rooms: { app_id: string }[], id: string) {
+function roomById(rooms: Room[], id: string) {
   return rooms.find((r) => r.app_id === id)!;
 }
 
