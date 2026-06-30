@@ -3,7 +3,8 @@
 **Date:** 2026-06-30 (screens/journey) — **re-verified 2026-06-30 (this revision)** after fixing the two review blockers raised on ATM-383 (untruthful lint gate, unresolved dependency-audit risk boundary).
 **Branch:** `atm-383-owner-cockpit`
 **Reviewed HEAD (prior to this fix):** `e2e6a32feb3f468c83301adec7d265c134db5793`
-**Final HEAD (fix commit):** `72991a963108660cf2290f0c1c77e3f46d3d5599` — all command outputs and the dependency-audit table in this revision were captured against this exact commit on `atm-383-owner-cockpit`.
+**Fix commit** (code + dep changes; all command outputs captured here)**:** `72991a963108660cf2290f0c1c77e3f46d3d5599` — `npm audit` before/after table, `vitest run`, `tsc --noEmit`, `next build`, and repo gates all run at this commit.
+**Final HEAD** (report-only stamp — this file only; no QA-relevant code changes)**:** `2795f45387e84e0b843690050d8b18387b8de7d4` — all evidence above was captured at the fix commit; this commit only binds the report to its own hash.
 **Tester:** Claude (AI assistant) — Vitest + live `next dev` walkthrough, real screenshots captured headlessly.
 **Model under test:** canonical WEAVE 0.2 — **Domain · Node · Workspace · Agent · Task · Event · Proof · Gate · Mirror · Context Pack**. Legacy terms (Room/Mission/Runtime/Courier) are not the implementation model.
 
@@ -180,4 +181,4 @@ exposed-dev-server-class findings that do not apply to this tool's actual
 
 ---
 
-*Report generated 2026-06-30 by Claude on branch `atm-383-owner-cockpit`. Screenshots captured headlessly (Chromium) against the local `next dev` server. This revision re-verified 2026-06-30 against `next@14.2.35` / `vitest@3.2.6` after fixing the lint-gate and dependency-audit blockers raised on ATM-383; all command outputs above were re-run, not carried over.*
+*Report generated 2026-06-30 by Claude on branch `atm-383-owner-cockpit`. Screenshots captured headlessly (Chromium) against the local `next dev` server. This revision re-verified 2026-06-30 against `next@14.2.35` / `vitest@3.2.6` after fixing the lint-gate and dependency-audit blockers raised on ATM-383; all command outputs were re-run at fix commit `72991a9`, not carried over. Final HEAD `2795f45387e84e0b843690050d8b18387b8de7d4` is a report-only stamp (no code changes) that binds this document to its own commit hash — all QA evidence is at the fix commit above.*
