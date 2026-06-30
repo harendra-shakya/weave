@@ -7,7 +7,7 @@
     .g{fill:none;stroke:#aab4c0;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
   </style>
   <rect width="920" height="230" fill="#0e1116"/>
-  <text x="40" y="34" class="ttl">WEAVE Owner Cockpit — source &amp; runtime icon set</text>
+  <text x="40" y="34" class="ttl">WEAVE Owner Cockpit — source &amp; Agent icon set</text>
   <text x="40" y="54" class="sub">in-repo inline SVG glyphs · monochrome (single accent for WEAVE) · no remote / network assets</text>
 
   <!-- WEAVE (accent) -->
@@ -35,7 +35,7 @@
     <rect x="-3" y="3" width="6" height="13" rx="3"/>
     <rect x="-16" y="-3" width="13" height="6" rx="3"/>
   </g>
-  <text x="348" y="172" class="lbl" text-anchor="middle">Slack · Courier</text>
+  <text x="348" y="172" class="lbl" text-anchor="middle">Slack · Mirror</text>
 
   <!-- GitHub -->
   <rect class="tile" x="415" y="70" width="116" height="120" rx="8"/>
@@ -54,7 +54,7 @@
     <polyline points="-4,-9 -13,0 -4,9"/>
     <polyline points="4,-9 13,0 4,9"/>
   </g>
-  <text x="598" y="172" class="lbl" text-anchor="middle">Codex · runtime</text>
+  <text x="598" y="172" class="lbl" text-anchor="middle">Codex · Agent</text>
 
   <!-- Claude -->
   <rect class="tile" x="665" y="70" width="116" height="120" rx="8"/>
@@ -63,7 +63,7 @@
     <line x1="-9.5" y1="-5.5" x2="9.5" y2="5.5"/>
     <line x1="9.5" y1="-5.5" x2="-9.5" y2="5.5"/>
   </g>
-  <text x="723" y="172" class="lbl" text-anchor="middle">Claude · runtime</text>
+  <text x="723" y="172" class="lbl" text-anchor="middle">Claude · Agent</text>
 
   <!-- Local runtime -->
   <rect class="tile" x="790" y="70" width="116" height="120" rx="8"/>
@@ -74,5 +74,5 @@
   </g>
   <text x="848" y="172" class="lbl" text-anchor="middle">Local runtime</text>
 
-  <text x="40" y="214" class="sub">Mirrors/Couriers (Linear/Slack/GitHub) always render beside the "Mirror/Courier — not source of truth" badge, never as a bare logo. The legacy example runtime name listed in ATM-385 is omitted — the repo scanner blocks it as a legacy surface (see brief §8 / Q2).</text>
+  <text x="40" y="214" class="sub">Mirrors (Linear/Slack/GitHub) always render beside the "Mirror — not source of truth" badge, never as a bare logo. The legacy example runtime name listed in ATM-385 is omitted — the repo scanner blocks it as a legacy surface (see brief §9 / Q-A).</text>
 </svg>

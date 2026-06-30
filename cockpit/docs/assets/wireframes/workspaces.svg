@@ -13,16 +13,16 @@
   <rect class="nav" y="30" width="220" height="870"/>
   <text x="20" y="62" class="brand">WEAVE</text><text x="20" y="80" class="sub">Owner Cockpit · v0.2 draft</text>
   <text x="24" y="122" class="navItem">Command Center</text>
-  <rect class="navActive" x="12" y="140" width="196" height="34" rx="6"/><text x="24" y="162" class="navItem" font-weight="700" fill="#2b313b">Rooms</text>
-  <text x="24" y="202" class="navItem">Missions</text><text x="24" y="242" class="navItem">Proof Ledger</text>
-  <text x="24" y="282" class="navItem">Gates</text><text x="24" y="322" class="navItem">Runtime</text><text x="24" y="362" class="navItem">Settings</text>
+  <rect class="navActive" x="12" y="140" width="196" height="34" rx="6"/><text x="24" y="162" class="navItem" font-weight="700" fill="#2b313b">Workspaces</text>
+  <text x="24" y="202" class="navItem">Tasks</text><text x="24" y="242" class="navItem">Proof Ledger</text>
+  <text x="24" y="282" class="navItem">Gates</text><text x="24" y="322" class="navItem">Agents</text><text x="24" y="362" class="navItem">Settings</text>
 
-  <text x="244" y="64" class="title">Rooms</text><text x="244" y="84" class="muted">Every app workspace in your company graph</text>
+  <text x="244" y="64" class="title">Workspaces</text><text x="244" y="84" class="muted">Every app workspace in your company graph</text>
   <rect class="chip" x="1240" y="50" width="168" height="22" rx="11"/><text x="1252" y="65" class="chipT">filter: attention state ▾</text>
 
   <!-- LIST -->
   <rect class="panel" x="244" y="100" width="1164" height="250" rx="8"/>
-  <text x="262" y="128" class="h2">Room list</text>
+  <text x="262" y="128" class="h2">Workspace list</text>
   <text x="262" y="156" class="muted">NAME</text><text x="470" y="156" class="muted">APP ID</text><text x="700" y="156" class="muted">STAGE</text><text x="900" y="156" class="muted">OPEN MISSIONS</text><text x="1120" y="156" class="muted">ATTENTION</text>
   <line x1="262" y1="166" x2="1390" y2="166" stroke="#e2e6eb"/>
   <g class="label">
@@ -34,7 +34,7 @@
 
   <!-- DETAIL -->
   <rect class="panel" x="244" y="366" width="1164" height="500" rx="8"/>
-  <text x="262" y="396" class="h2">Room detail — Receipts App</text>
+  <text x="262" y="396" class="h2">Workspace detail — Receipts App</text>
   <rect class="chip" x="510" y="380" width="62" height="20" rx="10"/><text x="518" y="394" class="chipT">Blocked</text>
   <rect class="chip" x="582" y="380" width="210" height="20" rx="10"/><text x="590" y="394" class="chipT">Linear · Mirror (not source of truth)</text>
 
@@ -55,7 +55,7 @@
   </g>
 
   <!-- columns -->
-  <text x="262" y="500" class="h2">Active Missions</text>
+  <text x="262" y="500" class="h2">Active Tasks</text>
   <rect class="row" x="262" y="512" width="360" height="56" rx="6"/><text x="274" y="536" class="label">Prepare production deploy packet</text><text x="274" y="556" class="muted">Codex · proof: missing</text>
   <rect class="row" x="262" y="576" width="360" height="56" rx="6"/><text x="274" y="600" class="label">Wire receipt export</text><text x="274" y="620" class="muted">Claude · proof: recorded</text>
 
@@ -73,5 +73,5 @@
   <text x="262" y="702" class="muted">app.json · lifecycle.json · deployment-gates.json · proof/proof-tray.json · blockers/blocker-tray.json</text>
   <rect class="row" x="262" y="720" width="280" height="40" rx="6"/><text x="276" y="745" class="label">Acknowledge blocker (local-only)</text>
 
-  <text x="244" y="888" class="muted">Wireframe · low-fidelity — list (top) + detail (bottom). Detail = route /rooms/[id].</text>
+  <text x="244" y="888" class="muted">Wireframe · low-fidelity — list (top) + detail (bottom). Detail = route /workspaces/[id].</text>
 </svg>
