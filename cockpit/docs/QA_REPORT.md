@@ -4,7 +4,7 @@
 **Branch:** `atm-383-owner-cockpit`
 **Reviewed HEAD (prior to this fix):** `e2e6a32feb3f468c83301adec7d265c134db5793`
 **Fix commit** (code + dep changes; all command outputs captured here)**:** `72991a963108660cf2290f0c1c77e3f46d3d5599` — `npm audit` before/after table, `vitest run`, `tsc --noEmit`, `next build`, and repo gates all run at this commit.
-**Final HEAD** (report-only stamp — this file only; no QA-relevant code changes)**:** `2795f45387e84e0b843690050d8b18387b8de7d4` — all evidence above was captured at the fix commit; this commit only binds the report to its own hash.
+**Final HEAD** (report-only stamp — this file only; no QA-relevant code changes)**:** `343275e850a4116192cc1de8c38c694a747103e1` — all evidence above was captured at the fix commit; this commit only binds the report to its own hash.
 **Tester:** Claude (AI assistant) — Vitest + live `next dev` walkthrough, real screenshots captured headlessly.
 **Model under test:** canonical WEAVE 0.2 — **Domain · Node · Workspace · Agent · Task · Event · Proof · Gate · Mirror · Context Pack**. Legacy terms (Room/Mission/Runtime/Courier) are not the implementation model.
 
