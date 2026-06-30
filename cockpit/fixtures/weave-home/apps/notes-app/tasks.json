@@ -10,7 +10,7 @@
       "objective": "Select the notes-app approach and record selection-stage proof.",
       "worker_packet_ref": "apps/notes-app/worker-packets/WP-0031.md",
       "review_loop": ["observe", "validate", "govern", "review", "sync"],
-      "runtime": "Local runtime",
+      "agent": "Local runtime",
       "due": "2026-07-03",
       "proof_state": "missing",
       "allowed": ["public-safe repo files", "local WEAVE skeleton state"],

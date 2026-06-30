@@ -1,0 +1,14 @@
+{
+  "schema": "weave-cockpit-node/v0.1",
+  "_fixture": true,
+  "node_id": "local-node",
+  "kind": "local",
+  "host": "local machine",
+  "hosts_agents": ["Codex", "Claude", "Local runtime"],
+  "state_path": "<cockpit>/fixtures/weave-home",
+  "non_claims": [
+    "does not prove a remote or production host",
+    "does not prove multi-node federation",
+    "single local node only this sprint"
+  ]
+}

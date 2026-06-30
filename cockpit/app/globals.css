@@ -68,6 +68,15 @@ a { color: inherit; text-decoration: none; }
 }
 .legend { display: flex; flex-wrap: wrap; gap: var(--sp-2); margin: var(--sp-2) 0 var(--sp-4); }
 
+/* ---- Domain · Node header strip (DESIGN_SYSTEM §5.13) ---- */
+.domain-node {
+  display: inline-flex; align-items: center; gap: 8px; flex-wrap: wrap;
+  font-size: var(--fs-sm); margin: 0 0 var(--sp-3);
+  padding: 4px 10px; border: 1px solid var(--border); border-radius: var(--r-pill);
+  background: var(--bg-1);
+}
+.domain-node .sep { color: var(--text-2); }
+
 /* ---- stage rail ---- */
 .rail { display: flex; flex-wrap: wrap; gap: 6px; }
 .step {

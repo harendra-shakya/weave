@@ -2,7 +2,7 @@
  * Owner-action overlay (brief §3.4, A3).
  *
  * Owner decisions taken in the cockpit (gate approve/hold, blocker
- * acknowledgement, runtime notes) are persisted to a LOCAL overlay file under
+ * acknowledgement, Agent notes) are persisted to a LOCAL overlay file under
  * the gitignored runs/ directory — the read-only WEAVE fixtures stay pristine
  * and state survives refresh + dev-server restart.
  *
@@ -25,7 +25,7 @@ export interface Overlay {
   schema: "weave-cockpit-overlay/v0.1";
   gates: Record<string, GateDecisionRecord>;
   acknowledgements: Record<string, { app_id: string; at: string }>;
-  notes: { runtime: string; app_id?: string; text: string; at: string }[];
+  notes: { agent: string; app_id?: string; text: string; at: string }[];
   events: WeaveEvent[];
 }
 
@@ -115,16 +115,16 @@ export async function recordAcknowledgement(
 
 export async function recordNote(
   file: string,
-  args: { runtime: string; appId?: string; text: string }
+  args: { agent: string; appId?: string; text: string }
 ): Promise<Overlay> {
   const overlay = await readOverlay(file);
   const at = new Date().toISOString();
-  overlay.notes.push({ runtime: args.runtime, app_id: args.appId, text: args.text, at });
+  overlay.notes.push({ agent: args.agent, app_id: args.appId, text: args.text, at });
   overlay.events.push({
     app_id: args.appId,
     at,
-    event: "runtime.note_posted",
-    intent: `note to ${args.runtime}`,
+    event: "agent.note_posted",
+    intent: `note to ${args.agent}`,
     state: "local_only",
     simulated: true,
   });

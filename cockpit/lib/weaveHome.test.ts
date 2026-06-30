@@ -1,19 +1,19 @@
 import { describe, it, expect } from "vitest";
 import path from "node:path";
-import { loadHome } from "./weaveHome";
+import { loadDomain } from "./weaveHome";
 import { emptyOverlay } from "./overlay";
-import type { Room } from "./types";
+import type { Workspace } from "./types";
 
 const FIXTURE = path.join(process.cwd(), "fixtures", "weave-home");
 
-function roomById(rooms: Room[], id: string) {
-  return rooms.find((r) => r.app_id === id)!;
+function workspaceById(workspaces: Workspace[], id: string) {
+  return workspaces.find((w) => w.app_id === id)!;
 }
 
-describe("loadHome — parses the fixture into a normalized Home", () => {
-  it("reads all four rooms", async () => {
-    const home = await loadHome({ homePath: FIXTURE, overlay: emptyOverlay() });
-    expect(home.rooms.map((r) => r.app_id).sort()).toEqual([
+describe("loadDomain — parses the fixture into a normalized Domain", () => {
+  it("reads all four workspaces", async () => {
+    const domain = await loadDomain({ homePath: FIXTURE, overlay: emptyOverlay() });
+    expect(domain.workspaces.map((w) => w.app_id).sort()).toEqual([
       "habit-tracker",
       "notes-app",
       "receipts-app",
@@ -21,25 +21,25 @@ describe("loadHome — parses the fixture into a normalized Home", () => {
     ]);
   });
 
-  it("derives the right attention state for each room", async () => {
-    const home = await loadHome({ homePath: FIXTURE, overlay: emptyOverlay() });
-    expect(roomById(home.rooms, "receipts-app").attention).toBe("blocked");
-    expect(roomById(home.rooms, "habit-tracker").attention).toBe("approval");
-    expect(roomById(home.rooms, "tiny-local-calculator").attention).toBe("ready");
-    expect(roomById(home.rooms, "notes-app").attention).toBe("stale");
+  it("derives the right attention state for each workspace", async () => {
+    const domain = await loadDomain({ homePath: FIXTURE, overlay: emptyOverlay() });
+    expect(workspaceById(domain.workspaces, "receipts-app").attention).toBe("blocked");
+    expect(workspaceById(domain.workspaces, "habit-tracker").attention).toBe("approval");
+    expect(workspaceById(domain.workspaces, "tiny-local-calculator").attention).toBe("ready");
+    expect(workspaceById(domain.workspaces, "notes-app").attention).toBe("stale");
   });
 
-  it("loads each room's 11 lifecycle stages in order", async () => {
-    const home = await loadHome({ homePath: FIXTURE, overlay: emptyOverlay() });
-    const receipts = roomById(home.rooms, "receipts-app");
+  it("loads each workspace's 11 lifecycle stages in order", async () => {
+    const domain = await loadDomain({ homePath: FIXTURE, overlay: emptyOverlay() });
+    const receipts = workspaceById(domain.workspaces, "receipts-app");
     expect(receipts.stages).toHaveLength(11);
     expect(receipts.stages[0].stage).toBe("intent");
     expect(receipts.stages[10].stage).toBe("analysis");
   });
 
   it("exposes the Habit Tracker owner-approval gate", async () => {
-    const home = await loadHome({ homePath: FIXTURE, overlay: emptyOverlay() });
-    const habit = roomById(home.rooms, "habit-tracker");
+    const domain = await loadDomain({ homePath: FIXTURE, overlay: emptyOverlay() });
+    const habit = workspaceById(domain.workspaces, "habit-tracker");
     expect(habit.gates[0].requires_owner_approval).toBe(true);
     expect(habit.gates[0].decision).toBeUndefined();
   });
@@ -53,15 +53,30 @@ describe("loadHome — parses the fixture into a normalized Home", () => {
       at: "2026-06-29T10:00:00Z",
       simulated: true,
     };
-    const home = await loadHome({ homePath: FIXTURE, overlay });
-    const habit = roomById(home.rooms, "habit-tracker");
+    const domain = await loadDomain({ homePath: FIXTURE, overlay });
+    const habit = workspaceById(domain.workspaces, "habit-tracker");
     expect(habit.gates[0].decision).toBe("approved");
     expect(habit.attention).toBe("none");
   });
 
-  it("loads runtimes named Codex / Claude / Local runtime (no legacy term)", async () => {
-    const home = await loadHome({ homePath: FIXTURE, overlay: emptyOverlay() });
-    expect(home.runtimes.map((r) => r.identity).sort()).toEqual([
+  it("composes a Task's Context Pack (objective + allowed/forbidden/non-claims)", async () => {
+    const domain = await loadDomain({ homePath: FIXTURE, overlay: emptyOverlay() });
+    const habit = workspaceById(domain.workspaces, "habit-tracker");
+    const task = habit.tasks[0];
+    expect(task.agent).toBe("Claude");
+    expect((task.allowed ?? []).length).toBeGreaterThan(0);
+    expect((task.forbidden ?? []).length).toBeGreaterThan(0);
+  });
+
+  it("loads the local Node (single local-node this sprint)", async () => {
+    const domain = await loadDomain({ homePath: FIXTURE, overlay: emptyOverlay() });
+    expect(domain.node?.node_id).toBe("local-node");
+    expect(domain.node?.kind).toBe("local");
+  });
+
+  it("loads agents named Codex / Claude / Local runtime (no legacy term)", async () => {
+    const domain = await loadDomain({ homePath: FIXTURE, overlay: emptyOverlay() });
+    expect(domain.agents.map((a) => a.identity).sort()).toEqual([
       "Claude",
       "Codex",
       "Local runtime",
@@ -69,9 +84,9 @@ describe("loadHome — parses the fixture into a normalized Home", () => {
   });
 
   it("surfaces Linear/Slack/GitHub as simulated mirrors, never source of truth", async () => {
-    const home = await loadHome({ homePath: FIXTURE, overlay: emptyOverlay() });
-    const tools = home.mirrors.map((m) => m.tool).sort();
+    const domain = await loadDomain({ homePath: FIXTURE, overlay: emptyOverlay() });
+    const tools = domain.mirrors.map((m) => m.tool).sort();
     expect(tools).toEqual(["GitHub", "Linear", "Slack"]);
-    expect(home.mirrors.every((m) => m.connection !== "connected")).toBe(true);
+    expect(domain.mirrors.every((m) => m.connection !== "connected")).toBe(true);
   });
 });

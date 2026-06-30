@@ -1,4 +1,4 @@
-import { loadHome } from "@/lib/weaveHome";
+import { loadDomain } from "@/lib/weaveHome";
 import { BlastTag, NonClaims, MirrorBadge } from "@/components/ui";
 import { GateDecision } from "@/components/actions";
 import type { Gate } from "@/lib/types";
@@ -6,9 +6,9 @@ import type { Gate } from "@/lib/types";
 export const dynamic = "force-dynamic";
 
 export default async function GateQueue() {
-  const home = await loadHome();
-  const gates: { gate: Gate; roomName: string }[] = home.rooms.flatMap((r) =>
-    r.gates.map((gate) => ({ gate, roomName: r.name }))
+  const domain = await loadDomain();
+  const gates: { gate: Gate; workspaceName: string }[] = domain.workspaces.flatMap((w) =>
+    w.gates.map((gate) => ({ gate, workspaceName: w.name }))
   );
 
   return (
@@ -19,7 +19,7 @@ export default async function GateQueue() {
       {gates.length === 0 ? (
         <div className="panel"><div className="empty">No gates awaiting you — nothing to approve.</div></div>
       ) : (
-        gates.map(({ gate, roomName }) => {
+        gates.map(({ gate, workspaceName }) => {
           const approvable = gate.requires_owner_approval && !gate.blocked_by_provider_access;
           const blockedReason = gate.blocked_by_provider_access
             ? "Not owner-approvable until provider access is validated (hard gate)."
@@ -31,7 +31,7 @@ export default async function GateQueue() {
                 <BlastTag blast={gate.blast_radius} />
                 {gate.mirror && <MirrorBadge mirror={{ tool: gate.mirror, kind: "Mirror", connection: "simulated" }} />}
                 <span className="spacer" />
-                <span className="muted" style={{ fontSize: "var(--fs-sm)" }}>{roomName}</span>
+                <span className="muted" style={{ fontSize: "var(--fs-sm)" }}>{workspaceName}</span>
               </div>
 
               <div className="grid cols-2" style={{ marginTop: 12, alignItems: "start" }}>

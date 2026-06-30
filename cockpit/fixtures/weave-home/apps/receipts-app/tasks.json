@@ -10,7 +10,7 @@
       "objective": "Assemble a deploy packet and identify the exact owner approval needed for production.",
       "worker_packet_ref": "apps/receipts-app/worker-packets/WP-0011.md",
       "review_loop": ["observe", "validate", "govern", "review", "sync"],
-      "runtime": "Codex",
+      "agent": "Codex",
       "due": "2026-07-02",
       "proof_state": "missing",
       "allowed": ["public-safe repo files", "local WEAVE skeleton state", "deterministic procedure prompts", "public docs & tests"],
@@ -26,7 +26,7 @@
       "objective": "Wire receipt export locally.",
       "worker_packet_ref": "apps/receipts-app/worker-packets/WP-0012.md",
       "review_loop": ["observe", "validate", "govern", "review", "sync"],
-      "runtime": "Claude",
+      "agent": "Claude",
       "due": "2026-07-01",
       "proof_state": "recorded"
     }

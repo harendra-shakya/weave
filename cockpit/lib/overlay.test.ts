@@ -64,10 +64,10 @@ describe("overlay persistence", () => {
 
   it("records a local-only note with no external send", async () => {
     const o = await recordNote(file, {
-      runtime: "Codex",
+      agent: "Codex",
       appId: "receipts-app",
       text: "Use the staging target, not prod.",
     });
-    expect(o.notes.at(-1)).toMatchObject({ runtime: "Codex", text: "Use the staging target, not prod." });
+    expect(o.notes.at(-1)).toMatchObject({ agent: "Codex", text: "Use the staging target, not prod." });
   });
 });

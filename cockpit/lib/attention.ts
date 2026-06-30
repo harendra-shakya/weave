@@ -2,15 +2,15 @@
  * Owner Attention derivation (brief §3.3) — the cockpit's core status vocabulary.
  *
  * WEAVE does not store a single "attention" field; the cockpit derives it per
- * Room/Mission from real fields (blockers + review queue + stage proof_state +
- * gates). Six states, evaluated in strict priority order — a Room shows its
+ * Workspace/Task from real fields (blockers + review queue + stage proof_state +
+ * gates). Six states, evaluated in strict priority order — a Workspace shows its
  * highest-priority match:
  *
  *   blocked > approval > needs-owner > ready > stale > none
  *
  * This module is pure and has no filesystem/React dependency so it can be the
  * first thing built test-first; lib/weaveHome assembles AttentionFacts from the
- * parsed WEAVE home and calls deriveAttention().
+ * parsed WEAVE Domain and calls deriveAttention().
  */
 import { STAGE_ORDER, type AttentionState, type StageId } from "./types";
 

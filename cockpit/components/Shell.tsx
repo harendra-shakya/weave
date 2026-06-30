@@ -10,11 +10,11 @@ import { SourceIcon } from "./SourceIcon";
 
 const NAV = [
   { href: "/", label: "Command Center" },
-  { href: "/rooms", label: "Rooms" },
-  { href: "/missions", label: "Missions" },
+  { href: "/workspaces", label: "Workspaces" },
+  { href: "/tasks", label: "Tasks" },
   { href: "/proof", label: "Proof Ledger" },
   { href: "/gates", label: "Gates" },
-  { href: "/runtime", label: "Runtime" },
+  { href: "/agents", label: "Agents" },
   { href: "/settings", label: "Settings" },
 ];
 

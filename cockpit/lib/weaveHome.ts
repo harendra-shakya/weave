@@ -1,31 +1,33 @@
 /**
- * WEAVE home reader (brief §1, §3).
+ * WEAVE Domain reader (brief §1, §4).
  *
  * Reads the local WEAVE home (the committed fixture by default, or a live
  * runs/cos-weave-home via WEAVE_HOME) and normalizes it into the cockpit's
- * Home/Room model. Owner decisions from the local overlay are merged in, and
- * the Owner Attention state is derived per room via lib/attention.
+ * canonical Domain/Workspace model. Owner decisions from the local overlay are
+ * merged in, and the Owner Attention state is derived per Workspace via
+ * lib/attention.
  *
  * Strictly local file reads. No outbound network calls.
  */
 import { promises as fs } from "node:fs";
 import path from "node:path";
 import {
-  type Home,
-  type Room,
+  type Domain,
+  type Workspace,
   type LifecycleStage,
   type Blocker,
   type Gate,
   type ProofEnvelope,
   type ReviewItem,
-  type Mission,
-  type RuntimeCheckpoint,
-  type MirrorCourier,
+  type Task,
+  type Agent,
+  type Mirror,
+  type WeaveNode,
   type WeaveEvent,
   type StageId,
 } from "./types";
 import { deriveAttention, type AttentionFacts } from "./attention";
-import { emptyOverlay, readOverlay, type Overlay } from "./overlay";
+import { readOverlay, type Overlay } from "./overlay";
 
 export function resolveHomePath(): string {
   if (process.env.WEAVE_HOME) return process.env.WEAVE_HOME;
@@ -70,20 +72,20 @@ async function readEvents(homePath: string): Promise<WeaveEvent[]> {
 
 const ADVANCING = /(proof|advanced|stage|gate\.)/i;
 
-function buildAttentionFacts(room: Omit<Room, "attention">, events: WeaveEvent[]): AttentionFacts {
-  const proofRecorded = room.proofs.some((p) => p.state === "recorded");
-  const reviewPending = room.reviews.some(
+function buildAttentionFacts(ws: Omit<Workspace, "attention">, events: WeaveEvent[]): AttentionFacts {
+  const proofRecorded = ws.proofs.some((p) => p.state === "recorded");
+  const reviewPending = ws.reviews.some(
     (r) => /pending/i.test(r.state) || r.decision === "not_accepted_as_done"
   );
   const recentAdvancingEvent = events.some(
-    (e) => e.app_id === room.app_id && ADVANCING.test(e.event)
+    (e) => e.app_id === ws.app_id && ADVANCING.test(e.event)
   );
   return {
-    currentStage: room.current_stage,
-    requestedStage: room.requested_stage,
-    stages: room.stages.map((s) => ({ stage: s.stage, state: s.state, proof_state: s.proof_state })),
-    blockers: room.blockers.map((b) => ({ state: b.state })),
-    gates: room.gates.map((g) => ({
+    currentStage: ws.current_stage,
+    requestedStage: ws.requested_stage,
+    stages: ws.stages.map((s) => ({ stage: s.stage, state: s.state, proof_state: s.proof_state })),
+    blockers: ws.blockers.map((b) => ({ state: b.state })),
+    gates: ws.gates.map((g) => ({
       launch_allowed: g.launch_allowed,
       blocked_by_provider_access: g.blocked_by_provider_access,
       requires_owner_approval: g.requires_owner_approval,
@@ -102,12 +104,12 @@ interface AppRegistryEntry {
   state: string;
 }
 
-async function loadRoom(
+async function loadWorkspace(
   homePath: string,
   entry: AppRegistryEntry,
   overlay: Overlay,
   events: WeaveEvent[]
-): Promise<Room> {
+): Promise<Workspace> {
   const id = entry.app_id;
   const appBase = path.join(homePath, "apps", id);
 
@@ -131,7 +133,7 @@ async function loadRoom(
     ["review-queue.json", "review/review-queue.json"],
     {}
   );
-  const taskLedger = await readJson<{ tasks?: Mission[] }>(path.join(appBase, "tasks.json"), {});
+  const taskLedger = await readJson<{ tasks?: Task[] }>(path.join(appBase, "tasks.json"), {});
   const gateFile = await readJson<{ gates?: Gate[] }>(path.join(appBase, "gates.json"), {});
 
   const gates: Gate[] = (gateFile.gates ?? []).map((g) => ({
@@ -139,13 +141,13 @@ async function loadRoom(
     decision: overlay.gates[g.id]?.decision,
   }));
 
-  const tracker: MirrorCourier = {
+  const tracker: Mirror = {
     tool: "Linear",
     kind: "Mirror",
     connection: app.tracker?.linear_required ? "simulated" : "disconnected",
   };
 
-  const base: Omit<Room, "attention"> = {
+  const base: Omit<Workspace, "attention"> = {
     app_id: id,
     name: app.name ?? entry.name ?? id,
     owner_intent: app.owner_intent ?? "",
@@ -158,7 +160,7 @@ async function loadRoom(
     gates,
     proofs: proofTray.items ?? [],
     reviews: reviewQueue.items ?? [],
-    missions: taskLedger.tasks ?? [],
+    tasks: taskLedger.tasks ?? [],
     tracker,
     non_claims: app.non_claims ?? [],
   };
@@ -166,12 +168,12 @@ async function loadRoom(
   return { ...base, attention: deriveAttention(buildAttentionFacts(base, events)) };
 }
 
-export interface LoadHomeOptions {
+export interface LoadDomainOptions {
   homePath?: string;
   overlay?: Overlay;
 }
 
-export async function loadHome(opts: LoadHomeOptions = {}): Promise<Home> {
+export async function loadDomain(opts: LoadDomainOptions = {}): Promise<Domain> {
   const homePath = opts.homePath ?? resolveHomePath();
   const overlay = opts.overlay ?? (await readOverlay());
 
@@ -180,19 +182,20 @@ export async function loadHome(opts: LoadHomeOptions = {}): Promise<Home> {
     path.join(homePath, "apps", "registry.json"),
     {}
   );
-  const runtimesFile = await readJson<{ runtimes?: RuntimeCheckpoint[] }>(
-    path.join(homePath, "runtimes.json"),
+  const agentsFile = await readJson<{ agents?: Agent[] }>(
+    path.join(homePath, "agents.json"),
     {}
   );
+  const node = await readJson<WeaveNode | undefined>(path.join(homePath, "node.json"), undefined);
   const fixtureEvents = await readEvents(homePath);
 
   const entries = registry.apps ?? [];
-  const rooms = await Promise.all(
-    entries.map((e) => loadRoom(homePath, e, overlay, fixtureEvents))
+  const workspaces = await Promise.all(
+    entries.map((e) => loadWorkspace(homePath, e, overlay, fixtureEvents))
   );
 
-  // Mirrors/Couriers — reflected/carried, never source of truth. Simulated this sprint.
-  const mirrors: MirrorCourier[] = [
+  // Mirrors — reflected/carried, never source of truth. Simulated this sprint.
+  const mirrors: Mirror[] = [
     { tool: "Linear", kind: "Mirror", connection: "disconnected" },
     { tool: "Slack", kind: "Courier", connection: "disconnected" },
     { tool: "GitHub", kind: "Mirror", connection: "disconnected" },
@@ -208,8 +211,9 @@ export async function loadHome(opts: LoadHomeOptions = {}): Promise<Home> {
     state: state.state ?? "local_skeleton_ready",
     source: homeSource(),
     source_path: opts.homePath ? "(custom)" : homeSource() === "fixture" ? "<cockpit>/fixtures/weave-home" : "(live)",
-    rooms,
-    runtimes: runtimesFile.runtimes ?? [],
+    node,
+    workspaces,
+    agents: agentsFile.agents ?? [],
     mirrors,
     events,
     non_claims: state.non_claims ?? [],

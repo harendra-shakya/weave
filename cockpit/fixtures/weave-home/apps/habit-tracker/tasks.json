@@ -10,7 +10,7 @@
       "objective": "Connect Linear write access so the runtime can mirror status outward (owner approval required).",
       "worker_packet_ref": "apps/habit-tracker/worker-packets/WP-0021.md",
       "review_loop": ["observe", "validate", "govern", "review", "sync"],
-      "runtime": "Claude",
+      "agent": "Claude",
       "due": "2026-07-01",
       "proof_state": "recorded",
       "allowed": ["public-safe repo files", "local WEAVE skeleton state", "simulated mirror writes"],

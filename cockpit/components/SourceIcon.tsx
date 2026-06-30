@@ -1,6 +1,6 @@
 /**
  * SourceIcon (DESIGN_SYSTEM §5.11) — inline, in-repo glyphs for the sources and
- * runtimes (mirrors assets/icons/icon-set.svg). currentColor only; no remote
+ * Agents (mirrors assets/icons/icon-set.svg). currentColor only; no remote
  * brand logos, no network. Pairs with a label/badge, never stands alone.
  */
 import type { CSSProperties } from "react";
@@ -67,14 +67,14 @@ const S: Record<SourceName, JSX.Element> = {
   ),
 };
 
-const RUNTIME_TO_NAME: Record<string, SourceName> = {
+const AGENT_TO_NAME: Record<string, SourceName> = {
   Codex: "codex",
   Claude: "claude",
   "Local runtime": "local",
 };
 
-export function runtimeIconName(runtime?: string): SourceName {
-  return (runtime && RUNTIME_TO_NAME[runtime]) || "local";
+export function agentIconName(agent?: string): SourceName {
+  return (agent && AGENT_TO_NAME[agent]) || "local";
 }
 
 export function SourceIcon({

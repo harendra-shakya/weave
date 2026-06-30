@@ -1,11 +1,11 @@
-import { loadHome } from "@/lib/weaveHome";
+import { loadDomain } from "@/lib/weaveHome";
 import { NonClaims, ReviewLoop, ProofTag } from "@/components/ui";
 
 export const dynamic = "force-dynamic";
 
 export default async function ProofLedger() {
-  const home = await loadHome();
-  const proofs = home.rooms.flatMap((r) => r.proofs.map((p) => ({ ...p, room: r.name })));
+  const domain = await loadDomain();
+  const proofs = domain.workspaces.flatMap((w) => w.proofs.map((p) => ({ ...p, workspace: w.name })));
 
   return (
     <>
@@ -14,9 +14,9 @@ export default async function ProofLedger() {
 
       <div className="grid cols-2" style={{ gridTemplateColumns: "1.6fr 1fr", alignItems: "start" }}>
         <div className="panel">
-          <div className="h2">Proof envelopes</div>
+          <div className="h2">Proofs</div>
           {proofs.length === 0 ? (
-            <div className="empty">No proof envelopes recorded yet.</div>
+            <div className="empty">No Proofs recorded yet.</div>
           ) : (
             proofs.map((p, i) => (
               <div key={i} className="row" style={{ display: "block" }}>
@@ -26,7 +26,7 @@ export default async function ProofLedger() {
                   <ProofTag kind="real" />
                 </div>
                 <div className="muted" style={{ fontSize: "var(--fs-sm)", margin: "4px 0" }}>
-                  {p.room} · <span className="mono">{p.proof_surface}</span> · state: {p.state}
+                  {p.workspace} · <span className="mono">{p.proof_surface}</span> · state: {p.state}
                 </div>
                 <div className="muted mono" style={{ fontSize: "var(--fs-xs)" }}>
                   {p.artifact_refs.join(" · ")}
@@ -41,7 +41,7 @@ export default async function ProofLedger() {
         <div className="panel">
           <div className="h2">Event log</div>
           <div className="muted" style={{ fontSize: "var(--fs-sm)", marginBottom: 8 }}>append-only · newest first</div>
-          {home.events.map((e, i) => (
+          {domain.events.map((e: typeof domain.events[number], i: number) => (
             <div key={i} className="row" style={{ display: "block", borderColor: e.simulated ? "var(--proof-sim)" : undefined }}>
               <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                 {e.simulated ? <ProofTag kind="sim" /> : <ProofTag kind="real" />}

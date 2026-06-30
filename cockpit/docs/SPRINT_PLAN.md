@@ -1,5 +1,13 @@
 # ATM-383 — WEAVE 0.2 Local Owner Cockpit Sprint (Plan)
 
+> **Vocabulary note (superseded terminology).** This planning doc was written with
+> the earlier Home/Castle · Room · Mission · Runtime · Courier terms. Per George's
+> 2026-06-30 update, the **canonical WEAVE 0.2 model is now primary**: Domain · Node ·
+> Workspace · Agent · Task · Event · Proof · Gate · Mirror · Context Pack. Read the
+> legacy terms below as their canonical equivalents (Room→Workspace, Mission→Task,
+> Runtime→Agent, Home→Domain, Courier→Mirror). The brief, design, build, and QA
+> deliverables all use the canonical model.
+
 ## Context
 
 Harendra is assigned **[ATM-383](https://linear.app/atumera-llc/issue/ATM-383/weave-02-local-owner-cockpit-sprint-formal-product-process-ui-mvp)**: a one-week sprint (Mon 2026-06-29 → Fri 2026-07-03) to deliver a **local owner cockpit UI** for WEAVE, run through a **formal product process**, not as a "just make wireframes" task.

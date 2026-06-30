@@ -1,9 +1,9 @@
 import Link from "next/link";
-import { loadHome } from "@/lib/weaveHome";
-import { ATTENTION_PRIORITY, attentionLabel, compareAttention } from "@/lib/attention";
-import { AttentionPill } from "@/components/ui";
+import { loadDomain } from "@/lib/weaveHome";
+import { compareAttention } from "@/lib/attention";
+import { AttentionPill, DomainNode } from "@/components/ui";
 import { AttentionLegend } from "@/components/legend";
-import { SourceIcon, runtimeIconName } from "@/components/SourceIcon";
+import { SourceIcon, agentIconName } from "@/components/SourceIcon";
 
 export const dynamic = "force-dynamic";
 
@@ -15,40 +15,41 @@ const HEALTH_COLOR: Record<string, string> = {
 };
 
 export default async function CommandCenter() {
-  const home = await loadHome();
-  const rooms = home.rooms;
+  const domain = await loadDomain();
+  const workspaces = domain.workspaces;
 
   const counts = {
-    activeRooms: rooms.length,
-    openMissions: rooms.reduce((n, r) => n + r.missions.filter((m) => m.state !== "done_for_scope").length, 0),
-    approvals: rooms.filter((r) => r.attention === "approval").length,
-    blocked: rooms.filter((r) => r.attention === "blocked").length,
-    ready: rooms.filter((r) => r.attention === "ready").length,
+    activeWorkspaces: workspaces.length,
+    openTasks: workspaces.reduce((n, w) => n + w.tasks.filter((t) => t.state !== "done_for_scope").length, 0),
+    approvals: workspaces.filter((w) => w.attention === "approval").length,
+    blocked: workspaces.filter((w) => w.attention === "blocked").length,
+    ready: workspaces.filter((w) => w.attention === "ready").length,
   };
 
-  const attentionItems = rooms
-    .filter((r) => r.attention !== "none")
+  const attentionItems = workspaces
+    .filter((w) => w.attention !== "none")
     .sort((a, b) => compareAttention(a.attention, b.attention))
-    .map((r) => ({
-      app_id: r.app_id,
-      name: r.name,
-      attention: r.attention,
-      reason: r.next_action || r.state,
+    .map((w) => ({
+      app_id: w.app_id,
+      name: w.name,
+      attention: w.attention,
+      reason: w.next_action || w.state,
       href:
-        r.attention === "approval" || r.attention === "blocked"
+        w.attention === "approval" || w.attention === "blocked"
           ? "/gates"
-          : `/rooms/${r.app_id}`,
+          : `/workspaces/${w.app_id}`,
     }));
 
   return (
     <>
       <h1 className="page-title">Command Center</h1>
-      <p className="page-sub">What needs you right now — across all Rooms</p>
+      <p className="page-sub">What needs you right now — across all Workspaces</p>
+      <DomainNode state={domain.state} node={domain.node} />
       <AttentionLegend />
 
       <div className="kpi-strip">
-        <div className="kpi"><div className="num">{counts.activeRooms}</div><div className="lbl">Active Rooms</div></div>
-        <div className="kpi"><div className="num">{counts.openMissions}</div><div className="lbl">Open Missions</div></div>
+        <div className="kpi"><div className="num">{counts.activeWorkspaces}</div><div className="lbl">Active Workspaces</div></div>
+        <div className="kpi"><div className="num">{counts.openTasks}</div><div className="lbl">Open Tasks</div></div>
         <div className="kpi"><div className="num" style={{ color: "var(--attn-approval)" }}>{counts.approvals}</div><div className="lbl">Needs-owner approvals</div></div>
         <div className="kpi"><div className="num" style={{ color: "var(--attn-blocked)" }}>{counts.blocked}</div><div className="lbl">Blocked</div></div>
         <div className="kpi"><div className="num" style={{ color: "var(--attn-ready)" }}>{counts.ready}</div><div className="lbl">Ready for review</div></div>
@@ -78,27 +79,27 @@ export default async function CommandCenter() {
 
         <div>
           <div className="panel">
-            <div className="h2">Active Rooms</div>
+            <div className="h2">Active Workspaces</div>
             <div className="grid cols-2">
-              {rooms.map((r) => (
-                <Link key={r.app_id} href={`/rooms/${r.app_id}`} className="row clickable" style={{ display: "block" }}>
-                  <div>{r.name}</div>
-                  <div className="muted" style={{ fontSize: "var(--fs-sm)", marginBottom: 6 }}>stage: {r.current_stage}</div>
-                  <AttentionPill state={r.attention} />
+              {workspaces.map((w) => (
+                <Link key={w.app_id} href={`/workspaces/${w.app_id}`} className="row clickable" style={{ display: "block" }}>
+                  <div>{w.name}</div>
+                  <div className="muted" style={{ fontSize: "var(--fs-sm)", marginBottom: 6 }}>stage: {w.current_stage}</div>
+                  <AttentionPill state={w.attention} />
                 </Link>
               ))}
             </div>
           </div>
 
           <div className="panel">
-            <div className="h2">Latest runtime checkpoints</div>
-            {home.runtimes.map((rt) => (
-              <div key={rt.identity} style={{ display: "flex", gap: 10, alignItems: "flex-start", marginBottom: 10 }}>
-                <span className="dot" style={{ background: HEALTH_COLOR[rt.health], marginTop: 6 }} />
-                <SourceIcon name={runtimeIconName(rt.identity)} size={14} style={{ marginTop: 4, color: "var(--text-1)" }} />
+            <div className="h2">Latest Agent checkpoints</div>
+            {domain.agents.map((ag) => (
+              <div key={ag.identity} style={{ display: "flex", gap: 10, alignItems: "flex-start", marginBottom: 10 }}>
+                <span className="dot" style={{ background: HEALTH_COLOR[ag.health], marginTop: 6 }} />
+                <SourceIcon name={agentIconName(ag.identity)} size={14} style={{ marginTop: 4, color: "var(--text-1)" }} />
                 <div>
-                  <div className="sec">{rt.identity}</div>
-                  <div className="muted" style={{ fontSize: "var(--fs-sm)" }}>{rt.health} · {rt.status}</div>
+                  <div className="sec">{ag.identity}</div>
+                  <div className="muted" style={{ fontSize: "var(--fs-sm)" }}>{ag.health} · {ag.status}</div>
                 </div>
               </div>
             ))}

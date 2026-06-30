@@ -101,7 +101,7 @@ export function AckBlocker({ blockerId, appId, acknowledged }: { blockerId: stri
   );
 }
 
-export function PostNote({ runtime, appId }: { runtime: string; appId?: string }) {
+export function PostNote({ agent, appId }: { agent: string; appId?: string }) {
   const router = useRouter();
   const [text, setText] = useState("");
   const [busy, setBusy] = useState(false);
@@ -111,7 +111,7 @@ export function PostNote({ runtime, appId }: { runtime: string; appId?: string }
       <textarea
         className="row"
         style={{ width: "100%", minHeight: 80, color: "var(--text-0)", background: "var(--bg-2)" }}
-        placeholder={`Type a note to ${runtime}…`}
+        placeholder={`Type a note to ${agent}…`}
         value={text}
         onChange={(e) => setText(e.target.value)}
       />
@@ -121,7 +121,7 @@ export function PostNote({ runtime, appId }: { runtime: string; appId?: string }
           disabled={busy || text.trim().length === 0}
           onClick={async () => {
             setBusy(true);
-            await post({ type: "post_note", runtime, appId, text });
+            await post({ type: "post_note", agent, appId, text });
             setBusy(false);
             setText("");
             setSent(true);

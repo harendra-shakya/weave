@@ -23,7 +23,7 @@ export type ActionRequest =
       blastRadius: BlastRadius;
     }
   | { type: "acknowledge_blocker"; blockerId: string; appId: string }
-  | { type: "post_note"; runtime: string; appId?: string; text: string };
+  | { type: "post_note"; agent: string; appId?: string; text: string };
 
 export type ActionResult =
   | { ok: true; overlay: Overlay }
@@ -56,11 +56,11 @@ export async function applyAction(file: string, req: ActionRequest): Promise<Act
       return { ok: true, overlay };
     }
     case "post_note": {
-      if (!req.runtime || !req.text) {
-        return { ok: false, error: "post_note requires runtime, text" };
+      if (!req.agent || !req.text) {
+        return { ok: false, error: "post_note requires agent, text" };
       }
       const overlay = await recordNote(file, {
-        runtime: req.runtime,
+        agent: req.agent,
         appId: req.appId,
         text: req.text,
       });

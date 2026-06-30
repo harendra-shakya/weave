@@ -1,14 +1,16 @@
 /**
  * Shared presentational components (DESIGN_SYSTEM §5): AttentionPill, StageRail,
- * MirrorBadge, NonClaims, BlastTag, ProofTag, EmptyState, ErrorPanel, ReviewLoop.
- * All token-driven; no hard-coded colors.
+ * MirrorBadge, NonClaims, BlastTag, ProofTag, EmptyState, ErrorPanel, ReviewLoop,
+ * ContextPack (§5.12), DomainNode (§5.13). All token-driven; no hard-coded colors.
  */
 import type { ReactNode } from "react";
 import {
   type AttentionState,
   type LifecycleStage,
-  type MirrorCourier,
+  type Mirror,
   type BlastRadius,
+  type ContextPack as ContextPackData,
+  type WeaveNode,
 } from "@/lib/types";
 import { attentionLabel } from "@/lib/attention";
 import { SourceIcon, type SourceName } from "./SourceIcon";
@@ -43,13 +45,13 @@ export function StageRail({ stages }: { stages: LifecycleStage[] }) {
   );
 }
 
-const TOOL_ICON: Record<MirrorCourier["tool"], SourceName> = {
+const TOOL_ICON: Record<Mirror["tool"], SourceName> = {
   Linear: "linear",
   Slack: "slack",
   GitHub: "github",
 };
 
-export function MirrorBadge({ mirror }: { mirror: MirrorCourier }) {
+export function MirrorBadge({ mirror }: { mirror: Mirror }) {
   return (
     <span className="mirror-badge" title={`${mirror.tool} ${mirror.kind} — not source of truth · ${mirror.connection}`}>
       <SourceIcon name={TOOL_ICON[mirror.tool]} size={12} />
@@ -108,8 +110,62 @@ export function EmptyState({ children }: { children: ReactNode }) {
 export function ErrorPanel({ children }: { children: ReactNode }) {
   return (
     <div className="error-panel">
-      <div className="lbl">Couldn’t read the WEAVE home</div>
+      <div className="lbl">Couldn’t read the Domain</div>
       <div className="muted" style={{ marginTop: 6 }}>{children}</div>
+    </div>
+  );
+}
+
+/**
+ * Context Pack panel (DESIGN_SYSTEM §5.12) — the bounded "what this Agent may and
+ * may not do" contract for one Task: Allowed / Forbidden / Non-claims, with the
+ * linked packet ref. Read-only; it frames why a local action may be disabled.
+ */
+export function ContextPack({ pack }: { pack: ContextPackData }) {
+  return (
+    <div className="panel">
+      <div style={{ display: "flex", alignItems: "center" }}>
+        <div className="h2" style={{ margin: 0 }}>Context Pack</div>
+        <span className="spacer" />
+        {pack.worker_packet_ref && (
+          <span className="mono muted" style={{ fontSize: "var(--fs-xs)" }}>{pack.worker_packet_ref}</span>
+        )}
+      </div>
+      <div className="grid cols-2" style={{ marginTop: 10, alignItems: "start" }}>
+        <div className="scope" data-kind="allowed">
+          <div className="h2">Allowed</div>
+          <ul className="tight">{pack.allowed.map((a, i) => <li key={i}>{a}</li>)}</ul>
+        </div>
+        <div className="scope" data-kind="forbidden">
+          <div className="h2">Forbidden</div>
+          <ul className="tight">{pack.forbidden.map((a, i) => <li key={i}>{a}</li>)}</ul>
+        </div>
+      </div>
+      <div style={{ marginTop: 10 }}>
+        <NonClaims items={pack.non_claims} />
+      </div>
+      {pack.consulted_contract_refs && pack.consulted_contract_refs.length > 0 && (
+        <div className="muted mono" style={{ fontSize: "var(--fs-xs)", marginTop: 8 }}>
+          contracts: {pack.consulted_contract_refs.join(" · ")}
+        </div>
+      )}
+    </div>
+  );
+}
+
+/**
+ * Domain · Node header strip (DESIGN_SYSTEM §5.13) — names the active sovereign
+ * graph + the local host the cockpit is reading on every screen.
+ */
+export function DomainNode({ state, node }: { state: string; node?: WeaveNode }) {
+  return (
+    <div className="domain-node">
+      <SourceIcon name="weave" size={12} style={{ color: "var(--accent)" }} />
+      <span className="sec">Domain</span>
+      <span className="muted">{state}</span>
+      <span className="sep">·</span>
+      <span className="sec">Node</span>
+      <span className="muted">{node ? `${node.node_id} · ${node.host}` : "local-node"}</span>
     </div>
   );
 }
