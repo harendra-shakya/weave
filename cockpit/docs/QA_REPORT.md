@@ -1,8 +1,9 @@
-# ATM-386 QA Report — WEAVE 0.2 Local Owner Cockpit
+# ATM-387 QA Report — WEAVE 0.2 Local Owner Cockpit (canonical model)
 
-**Date:** 2026-06-29  
-**Branch:** `atm-383-owner-cockpit`  
-**Tester:** Claude (AI assistant, interactive preview + accessibility-tree verification)
+**Date:** 2026-06-30
+**Branch:** `atm-383-owner-cockpit`
+**Tester:** Claude (AI assistant) — Vitest + live `next dev` walkthrough, real screenshots captured headlessly.
+**Model under test:** canonical WEAVE 0.2 — **Domain · Node · Workspace · Agent · Task · Event · Proof · Gate · Mirror · Context Pack**. Legacy terms (Room/Mission/Runtime/Courier) are not the implementation model.
 
 ---
 
@@ -10,114 +11,94 @@
 
 | Item | Value |
 |---|---|
-| Repo path | `P:\Development\Projects\weave\cockpit\` |
+| Repo path | `cockpit/` |
 | Branch | `atm-383-owner-cockpit` |
-| Package manager | npm (Node 20.x) |
-| Run command | `cd cockpit && npm install && npm run dev` |
-| Data source | Fixture JSON at `cockpit/fixtures/weave-home/` (4 rooms) |
-| What is real | Local file reads, overlay writes to `runs/cockpit-overlay.json` |
-| What is simulated | All external effects (deploy, Linear write, Slack send) — logged as `simulated:true` |
-| Missing access | Real Cloudflare/Vercel provider validation (intentionally out of scope) |
+| Run command | `cd cockpit && npm install && npm run dev` (next dev only — open the URL it prints) |
+| Data source | Fixture Domain at `cockpit/fixtures/weave-home/` — one local Node, 4 Workspaces |
+| What is real | Local file reads; overlay writes to `runs/cockpit-overlay.json` |
+| What is simulated | All external effects (deploy, Linear write, Slack send) — recorded `simulated:true` |
+| Out of scope | Real Cloudflare/Vercel provider validation; live `WEAVE_HOME` mode |
 
 ---
 
-## Unit test results
+## QA matrix (each area: PASS / FAIL / BLOCKED)
 
+| # | Area | Checks | Result |
+|---|---|---|---|
+| 1 | **Startup / install** | `npm install` + `npm run dev` start the cockpit with no secrets and no production dependency; fixture Domain loads by default | **PASS** |
+| 2 | **Owner journey** | Command Center → Workspace → Task (Context Pack) → Proof/Gate → Approve (local-only) completes end-to-end | **PASS** |
+| 3 | **State persistence** | Gate approval written to overlay; survives refresh and dev-server restart (read back from disk) | **PASS** |
+| 4 | **Boundary safety** | No real external write/mutation; no secrets read or shown; every external effect tagged `SIMULATED` | **PASS** |
+| 5 | **Visual / UX** | Canonical nav + Domain·Node strip; attention palette; 11-stage rail; Context Pack panel; empty/blocked states render | **PASS** |
+| 6 | **Proof labeling** | Mirrors labeled "not source of truth"; non-claims shown beside claims; proof vs SIMULATED visually distinct | **PASS** |
+| 7 | **Regression / smoke** | `tsc --noEmit` clean; Vitest 36/36; public-safe scan + secrets scan clean | **PASS** |
+
+No FAIL or BLOCKED areas.
+
+---
+
+## Command outputs
+
+**Typecheck** — `npx tsc --noEmit`: clean (no output).
+
+**Unit tests** — `npx vitest run`:
 ```
 Test Files  5 passed (5)
-Tests       34 passed (34)
-Start at    17:53:18
-Duration    1.98s
+Tests       36 passed (36)
 
 lib/attention.test.ts    13 ✓  (6-state derivation rules)
-lib/overlay.test.ts       5 ✓  (read/write/merge)
-lib/weaveHome.test.ts     7 ✓  (fixture parsing + attention recovery)
 lib/actions.test.ts       3 ✓  (approve/hold/reject unknown)
-components/ui.test.tsx    6 ✓  (AttentionPill, StageRail, MirrorBadge, NonClaims)
+lib/overlay.test.ts       5 ✓  (read/write/merge, agent note)
+lib/weaveHome.test.ts     9 ✓  (Domain parsing + attention recovery + Node + Context Pack)
+components/ui.test.tsx     6 ✓  (AttentionPill, StageRail, MirrorBadge, NonClaims)
 ```
+
+**Repo gates:**
+```
+public_safe_repo_scan.py : ok   (no loopback-host or legacy-surface strings committed)
+check_no_secrets.py      : ok   (no API keys / tokens / private keys committed)
+git diff --check         : ok   (no whitespace errors)
+```
+
+**Core WEAVE Python suite** (`python -m unittest discover -s tests`): 2 failures + 2 errors —
+`test_cos_weave_bootstrap_contract` and `test_validate_docs_current`. These are
+**pre-existing on this branch and unrelated to the cockpit work**: verified by
+running the same modules against the session-start commit `6598bde` (identical 2
+failures + 2 errors), and neither test references `cockpit/`. The cockpit is an
+isolated Node sub-project; this migration touched only `cockpit/**` and Linear
+deliverables, not the core Python skeleton these tests cover. Flagged for the
+owner as a separate, out-of-scope item.
 
 ---
 
-## CI scanner results
+## Screen verification (9 screens via live `next dev`, real screenshots attached)
 
-```
-public-safe repo scan: ok      (no localhost/127.0.0.1/legacy-surface strings committed)
-check_no_secrets.py: ok        (no API keys / tokens / private keys committed)
-```
-
----
-
-## Screen verification (all 9 screens via interactive preview)
-
-### 1. Command Center `/`
-- KPI strip: 4 Active Rooms, 4 Open Missions, **1 Needs-owner approvals**, 1 Blocked, 1 Ready for review
-- Attention list severity-sorted: Blocked (Receipts) → Approval required (Habit Tracker) → Ready for review (Calculator) → Stale (Notes App)
-- Active Rooms grid: all 4 rooms with stage + attention state
-- Runtime checkpoints: Codex (healthy), Claude (healthy), Local runtime (idle)
-- Boundary banner: "Local-only cockpit · fixture data · no secrets · external actions simulated" ✅
-
-### 2. Room Detail `/rooms/[id]` — Habit Tracker
-- Heading + attention pill: "Approval required" ✅
-- Linear Mirror badge: "Linear · Mirror — not source of truth" ✅
-- Lifecycle stage rail: all 11 stages rendered ✅
-- Active Mission link with Claude runtime + proof state ✅
-- Proof & evidence claim + surface + non-claims ✅
-- No blockers shown (correct — this room's attention is approval, not blocked) ✅
-
-### 3. Mission Board `/missions`
-- 4 columns: Open, In progress, Ready for review, Done for scope ✅
-- All 4 missions visible with runtime, due date, app context ✅
-
-### 4. Mission Detail `/missions/TASK-0021`
-- Title, TASK ID, Room link, stage ✅
-- Allowed list / Forbidden list ✅
-- Runtime (Claude icon + label), Due date, Proof status: recorded ✅
-- Review loop: Observe ✓ Validate ✓ Govern ✓ Review ✓ Sync ✓ ✅
-- Non-claims list ✅
-
-### 5. Proof / Evidence Ledger `/proof`
-- All 3 proof envelopes (Receipts, Habit Tracker, Calculator) ✅
-- Claims, proof surface (TOOL_VERIFIED_LOCAL), state (recorded) ✅
-- Review loop per envelope ✅
-- Non-claims per envelope ✅
-- Event log showing SIMULATED gate.approved event ✅
-
-### 6. Gate / Approval Queue `/gates`
-- 2 gates: Deploy Receipts App (HIGH blast radius) + Connect Linear write (MEDIUM) ✅
-- Hard gate warning on Receipts: "Not owner-approvable until provider access is validated" ✅
-- SIMULATED warning on both: "⚠ External effect is SIMULATED" ✅
-- Approve (local-only) + Hold buttons ✅
-
-### 7. Runtime / Agent Panel `/runtime`
-- Codex: healthy, current task, needs-owner input question, status history, note composer ✅
-- Claude: healthy, current task, status history, note composer ✅
-- Local runtime: idle, note composer ✅
-- All note composers: "Stored locally · not sent externally" ✅
-
-### 8. Settings / Data Source `/settings`
-- Fixture data selected (vs Live local WEAVE home toggle) ✅
-- Resolved path: `<cockpit>/fixtures/weave-home` ✅
-- Proof boundary bullet list (5 items) ✅
-- Mirrors/Couriers: Linear (Mirror, disconnected), Slack (Courier, disconnected), GitHub (Mirror, disconnected) ✅
-- About: "WEAVE 0.2 — draft, not final" ✅
-
-### 9. Rooms List `/rooms`
-- Accessible via nav + verified through room links ✅
+| # | Screen | Route | Verified | Shot |
+|---|---|---|---|---|
+| 1 | Command Center | `/` | Domain·Node strip; KPIs (4 Active Workspaces, 4 Open Tasks, 1 Needs-owner approval, 1 Blocked, 1 Ready); severity-sorted attention list; Latest Agent checkpoints | `01-command-center.png` |
+| 2 | Workspace List | `/workspaces` | 4 Workspaces with stage + open-task count + attention pill | `02-workspaces.png` |
+| 3 | Workspace Detail | `/workspaces/habit-tracker` | Attention pill + Linear Mirror badge; 11-stage rail; Active Tasks; Proof; Blockers | `03-workspace-habit-tracker.png` |
+| 4 | Task Board | `/tasks` | 4-column board (Open / In progress / Ready for review / Done for scope) with Agent + due | `04-tasks-board.png` |
+| 5 | Task Detail | `/tasks/TASK-0021` | **Context Pack** (Allowed / Forbidden / Not-proven + packet ref); Agent & proof; review-loop stepper | `05-task-detail-context-pack.png` |
+| 6 | Proof / Evidence Ledger | `/proof` | Proofs (claim, surface, non-claims, review loop) + Event Log with SIMULATED separation | `06-proof-ledger.png` |
+| 7 | Gate / Approval Queue | `/gates` | 2 Gates; hard-gate reason on Receipts; SIMULATED warning; Approve/Hold | `07-gates-before.png` |
+| 8 | Agents | `/agents` | Codex / Claude / Local runtime with health, input-request, history, local note composer | `08-agents.png` |
+| 9 | Settings / Data Source | `/settings` | Data source toggle; **Node panel** (local-node, kind, host, state path, agents); proof boundary; Mirrors | `09-settings-node.png` |
 
 ---
 
-## Owner journey — end-to-end
+## Owner journey — end-to-end (real screenshots)
 
-**Journey:** Command Center → Room (Habit Tracker) → Mission (TASK-0021) → Gates → Approve
+**Journey:** Command Center → Workspace (Habit Tracker) → Task (TASK-0021, Context Pack) → Gate → Approve (local-only)
 
 | Step | Action | Result |
 |---|---|---|
-| 1 | Land on Command Center | Habit Tracker shows "Approval required", needs-owner counter = 1 |
-| 2 | Click Habit Tracker room | Room detail shows approval badge, Linear Mirror, lifecycle rail |
-| 3 | Click mission link | Mission detail shows TASK-0021 with proof recorded, review loop all ✓ |
-| 4 | Navigate to Gates | Two gates; Habit Tracker gate shows launch_allowed=true, Approve button enabled |
-| 5 | Click "Approve (local-only)" | Shows "Approved (local-only · simulated)" + "event appended: gate.approved (SIMULATED)" |
-| 6 | Return to Command Center | **Habit Tracker now "None"**, needs-owner counter = **0**, dropped from attention list |
+| 1 | Land on Command Center | Habit Tracker = "Approval required"; needs-owner approvals = 1 (`01-command-center.png`) |
+| 2 | Open Habit Tracker Workspace | Approval pill + Linear Mirror badge + 11-stage rail (`03-workspace-habit-tracker.png`) |
+| 3 | Open Task TASK-0021 | Context Pack renders Allowed/Forbidden/Non-claims + packet ref; proof recorded, review loop all ✓ (`05-task-detail-context-pack.png`) |
+| 4 | Go to Gates | Habit Tracker gate `launch_allowed=true`, Approve enabled; SIMULATED warning (`07-gates-before.png`) |
+| 5 | Approve (local-only) | "Approved (local-only · simulated)" + "event appended: gate.approved (SIMULATED)" (`10-gate-approved.png`) |
+| 6 | Return to Command Center | Habit Tracker = "None"; needs-owner approvals = **0**; dropped from attention list (`11-command-center-after.png`) |
 
 **Journey result: PASS** ✅
 
@@ -127,48 +108,34 @@ check_no_secrets.py: ok        (no API keys / tokens / private keys committed)
 
 | Test | Procedure | Result |
 |---|---|---|
-| Overlay written to disk | After approve, read `cockpit/runs/cockpit-overlay.json` | File present; `decision: "approved"`, `simulated: true` ✅ |
-| State survives refresh | Reload Command Center in same session | Habit Tracker still "None" ✅ |
-| State survives restart | Stop server, start fresh, load Command Center | Habit Tracker still "None", needs-owner = 0 ✅ |
+| Overlay written to disk | After approve, inspect `runs/cockpit-overlay.json` | `decision:"approved"`, `simulated:true` ✅ |
+| Survives refresh | Reload Command Center | Habit Tracker still "None" ✅ |
+| Survives restart | Read back from overlay on a fresh process | Decision persists; attention stays "None" ✅ |
 
 **Persistence result: PASS** ✅
 
 ---
 
-## Boundary labels verification
+## Final truth statement
 
-| Boundary | Where shown | Verified |
-|---|---|---|
-| Fixture vs real local data | Settings → "Fixture data · selected" + resolved path | ✅ |
-| Local proof vs production proof | Settings → proof boundary bullets + "Not production · not externally verified" | ✅ |
-| Mirror/Courier vs source-of-truth | Every mirror badge + Settings mirrors section | ✅ |
-| Simulated approval vs actual action | Gate page warning + action result confirmation text | ✅ |
-| Local-only boundary banner | Every page header | ✅ |
+**What is proven (local).** The cockpit renders the WEAVE Domain (Node, Workspaces, Agents, Tasks, Proofs, Gates, Events) from local files across 9 screens; the owner can walk the full journey and take a local Gate decision; the decision persists to a local overlay and survives refresh + restart; the new **Node** and **Context Pack** primitives render from real fixture/composed data.
 
----
+**What is fixture-backed / local-only.** The demo Domain is the committed fixture at `cockpit/fixtures/weave-home/` (one local Node). Live mode (`WEAVE_HOME` → a real `runs/cos-weave-home`) is supported in code but not exercised this sprint.
 
-## What is proven
+**What is simulated.** Every external-surface action (deploy, Linear/Slack/GitHub write) is recorded as a local owner decision + a `SIMULATED` Event. Nothing external is executed; no outbound network calls; no secrets read or shown.
 
-- Local UI renders WEAVE fixture state accurately across 9 screens
-- Owner can navigate the full journey: Command Center → Room → Mission → Proof/Gate → required action
-- Gate approval persists to a local overlay file, survives refresh and restart
-- All external effects (deploy, Linear write) are recorded as SIMULATED, never executed
-- No secrets read or shown anywhere
+**What is NOT production / externally verified.** No production deploy/hosting; no real provider (Cloudflare/Vercel) validation; no real Mirror write; not load/auth tested. WEAVE 0.2 is a draft, not final.
 
-## What is NOT proven (by design)
-
-- Does not prove Cloudflare/Vercel deployment (hard gate, blocked by missing provider access)
-- Does not perform real Linear write (mirror only, approval is local simulation)
-- Does not prove production-grade load, auth, or real Slack/GitHub mutation
-- Not externally verified — local dev tool only
-
-## Known limitations / follow-up (ATM-387)
-
-- Brave browser shields block content rendering on localhost in the current computer-use setup; Chrome extension (gif_creator) was not connected so a GIF recording could not be produced
-- Rooms List page (`/rooms`) is accessible via nav but no explicit table test; covered implicitly by room navigation
-- Notes App `/rooms/notes-app` has no active mission (correct — stale room); detail page would show EmptyState for missions
-- Live WEAVE home mode (`WEAVE_HOME` env var) not tested this sprint; fixture-only acceptable per ATM-386 spec
+**What must happen next.** Owner to confirm the three new-primitive semantics flagged in ATM-384 §9 (**Node**, **Domain**, **Context Pack**). If confirmed differently, the Node model and Context Pack composition are localized changes (`lib/types.ts`, `lib/weaveHome.ts`, the two components + fixtures) and re-QA is fast.
 
 ---
 
-*Report generated: 2026-06-29 by Claude on branch `atm-383-owner-cockpit`*
+## Known limitations / follow-up
+
+- Fixture-only this sprint; live `WEAVE_HOME` mode not exercised (acceptable per ATM-386 spec).
+- Notes App has no recorded proof (correct — it is the "stale / no proof" Workspace); its Task detail shows the missing-proof state.
+- New-primitive semantics (Node/Domain/Context Pack) built to working assumptions pending owner confirmation (ATM-384 §9).
+
+---
+
+*Report generated 2026-06-30 by Claude on branch `atm-383-owner-cockpit`. Screenshots captured headlessly (Chromium) against the local `next dev` server.*
