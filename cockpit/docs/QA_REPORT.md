@@ -3,7 +3,7 @@
 **Date:** 2026-06-30 (screens/journey) — **re-verified 2026-06-30 (this revision)** after fixing the two review blockers raised on ATM-383 (untruthful lint gate, unresolved dependency-audit risk boundary).
 **Branch:** `atm-383-owner-cockpit`
 **Reviewed HEAD (prior to this fix):** `e2e6a32feb3f468c83301adec7d265c134db5793`
-**Final HEAD (this fix, includes this report):** see `git log -1 --format=%H` on `atm-383-owner-cockpit` — recorded immediately after commit in the PR/issue comment; this file is part of that commit so it cannot self-quote its own hash.
+**Final HEAD (fix commit):** `72991a963108660cf2290f0c1c77e3f46d3d5599` — all command outputs and the dependency-audit table in this revision were captured against this exact commit on `atm-383-owner-cockpit`.
 **Tester:** Claude (AI assistant) — Vitest + live `next dev` walkthrough, real screenshots captured headlessly.
 **Model under test:** canonical WEAVE 0.2 — **Domain · Node · Workspace · Agent · Task · Event · Proof · Gate · Mirror · Context Pack**. Legacy terms (Room/Mission/Runtime/Courier) are not the implementation model.
 
