@@ -44,6 +44,23 @@ survive refresh **and** restart.
 npm test         # vitest — lib derivation, overlay, reader, action dispatch, components
 ```
 
+## QA gates
+
+There is no ESLint config in this project, so `npm run lint` does not exist —
+running it would be a false QA claim (it would either fail to resolve or, on a
+stock `next lint`, drop into an interactive setup prompt and exit non-zero with
+no actual linting performed). The truthful QA gates for this sprint are:
+
+```bash
+npx tsc --noEmit                              # typecheck (npm run typecheck)
+npm test                                      # unit tests
+npm exec --yes next build                     # production build compiles
+python scripts/public_safe_repo_scan.py       # no loopback-host / legacy-surface strings
+python scripts/check_no_secrets.py            # no committed secrets
+npm audit --audit-level=high                  # dependency risk — see QA_REPORT.md for the
+                                               # accepted local-only risk boundary
+```
+
 ## The owner journey
 
 Command Center → open a Workspace → open a Task (with its Context Pack) → review

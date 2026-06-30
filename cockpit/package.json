@@ -7,10 +7,10 @@
     "dev": "next dev",
     "test": "vitest run",
     "test:watch": "vitest",
-    "lint": "next lint"
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "next": "14.2.5",
+    "next": "14.2.35",
     "react": "18.3.1",
     "react-dom": "18.3.1"
   },
@@ -23,6 +23,6 @@
     "@vitejs/plugin-react": "4.3.1",
     "jsdom": "24.1.1",
     "typescript": "5.5.4",
-    "vitest": "2.0.5"
+    "vitest": "3.2.6"
   }
 }
