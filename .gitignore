@@ -17,3 +17,5 @@ cockpit/package-lock.json
 runs/
 evidence/
 .workflow/
+
+design_handoff_ledger_cockpit/

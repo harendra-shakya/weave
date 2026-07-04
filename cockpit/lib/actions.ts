@@ -3,14 +3,16 @@
  *
  * Every action is LOCAL: it records a decision in the overlay and, for
  * external-surface actions, appends a SIMULATED event. Nothing here performs a
- * real deploy, tracker write, send, or credential access. Unknown or malformed
- * actions are rejected — never partially applied.
+ * real deploy, tracker write, send, or credential access.
  */
 import type { BlastRadius } from "./types";
 import {
   recordGateDecision,
   recordAcknowledgement,
   recordNote,
+  recordReviewAcceptance,
+  recordTaskAnswer,
+  resetOverlay,
   type Overlay,
 } from "./overlay";
 
@@ -23,7 +25,10 @@ export type ActionRequest =
       blastRadius: BlastRadius;
     }
   | { type: "acknowledge_blocker"; blockerId: string; appId: string }
-  | { type: "post_note"; agent: string; appId?: string; text: string };
+  | { type: "post_note"; agent: string; appId?: string; text: string }
+  | { type: "accept_review"; reviewId: string; appId: string }
+  | { type: "answer_task"; taskId: string; appId: string; agent: string; text: string }
+  | { type: "reset_overlay" };
 
 export type ActionResult =
   | { ok: true; overlay: Overlay }
@@ -64,6 +69,32 @@ export async function applyAction(file: string, req: ActionRequest): Promise<Act
         appId: req.appId,
         text: req.text,
       });
+      return { ok: true, overlay };
+    }
+    case "accept_review": {
+      if (!req.reviewId || !req.appId) {
+        return { ok: false, error: "accept_review requires reviewId, appId" };
+      }
+      const overlay = await recordReviewAcceptance(file, {
+        reviewId: req.reviewId,
+        appId: req.appId,
+      });
+      return { ok: true, overlay };
+    }
+    case "answer_task": {
+      if (!req.taskId || !req.appId || !req.agent || !req.text) {
+        return { ok: false, error: "answer_task requires taskId, appId, agent, text" };
+      }
+      const overlay = await recordTaskAnswer(file, {
+        taskId: req.taskId,
+        appId: req.appId,
+        agent: req.agent,
+        text: req.text,
+      });
+      return { ok: true, overlay };
+    }
+    case "reset_overlay": {
+      const overlay = await resetOverlay(file);
       return { ok: true, overlay };
     }
     default:

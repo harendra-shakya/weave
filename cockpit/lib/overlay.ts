@@ -2,9 +2,9 @@
  * Owner-action overlay (brief §3.4, A3).
  *
  * Owner decisions taken in the cockpit (gate approve/hold, blocker
- * acknowledgement, Agent notes) are persisted to a LOCAL overlay file under
- * the gitignored runs/ directory — the read-only WEAVE fixtures stay pristine
- * and state survives refresh + dev-server restart.
+ * acknowledgement, Agent notes, review acceptance, task answers) are persisted
+ * to a LOCAL overlay file under the gitignored runs/ directory — the read-only
+ * WEAVE fixtures stay pristine and state survives refresh + dev-server restart.
  *
  * Every external-surface decision appends a SIMULATED event. The cockpit never
  * performs the real external effect; it only records that the owner decided.
@@ -27,6 +27,10 @@ export interface Overlay {
   acknowledgements: Record<string, { app_id: string; at: string }>;
   notes: { agent: string; app_id?: string; text: string; at: string }[];
   events: WeaveEvent[];
+  /** review acceptances: keyed by review item id */
+  reviewsAccepted: Record<string, { app_id: string; at: string }>;
+  /** task answers: keyed by task_id */
+  taskAnswers: Record<string, { agent: string; text: string; at: string }>;
 }
 
 export function emptyOverlay(): Overlay {
@@ -36,6 +40,8 @@ export function emptyOverlay(): Overlay {
     acknowledgements: {},
     notes: [],
     events: [],
+    reviewsAccepted: {},
+    taskAnswers: {},
   };
 }
 
@@ -90,6 +96,18 @@ export async function recordGateDecision(
     simulated: true,
     blast_radius: args.blastRadius,
   });
+  if (args.decision === "approved") {
+    // append the simulated effect event too
+    overlay.events.push({
+      app_id: args.appId,
+      at,
+      event: "effect.simulated",
+      intent: args.action,
+      state: "simulated",
+      simulated: true,
+      blast_radius: args.blastRadius,
+    });
+  }
   await writeOverlay(file, overlay);
   return overlay;
 }
@@ -130,4 +148,50 @@ export async function recordNote(
   });
   await writeOverlay(file, overlay);
   return overlay;
+}
+
+export async function recordReviewAcceptance(
+  file: string,
+  args: { reviewId: string; appId: string }
+): Promise<Overlay> {
+  const overlay = await readOverlay(file);
+  const at = new Date().toISOString();
+  overlay.reviewsAccepted[args.reviewId] = { app_id: args.appId, at };
+  overlay.events.push({
+    app_id: args.appId,
+    at,
+    event: "review.accepted",
+    intent: args.reviewId,
+    state: "accepted",
+    simulated: false,
+  });
+  await writeOverlay(file, overlay);
+  return overlay;
+}
+
+export async function recordTaskAnswer(
+  file: string,
+  args: { taskId: string; appId: string; agent: string; text: string }
+): Promise<Overlay> {
+  const overlay = await readOverlay(file);
+  const at = new Date().toISOString();
+  overlay.taskAnswers[args.taskId] = { agent: args.agent, text: args.text, at };
+  // also post as a note so the agent sees it
+  overlay.notes.push({ agent: args.agent, app_id: args.appId, text: `[Answer for ${args.taskId}] ${args.text}`, at });
+  overlay.events.push({
+    app_id: args.appId,
+    at,
+    event: "owner.answered_question",
+    intent: args.taskId,
+    state: "answered",
+    simulated: false,
+  });
+  await writeOverlay(file, overlay);
+  return overlay;
+}
+
+export async function resetOverlay(file: string): Promise<Overlay> {
+  const fresh = emptyOverlay();
+  await writeOverlay(file, fresh);
+  return fresh;
 }

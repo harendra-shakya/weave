@@ -1,88 +1,90 @@
-/*
- * WEAVE 0.2 Owner Cockpit — design tokens
- * Single source of truth for color, type, spacing, and the Owner Attention
- * status palette. Consumed by every component (ATM-385 / ATM-386).
- * Aesthetic: dark "mission control / console", one accent, information-dense.
- * No external assets, no remote fonts — system font stacks only.
- */
+/* ============================================================
+   WEAVE Owner Cockpit — "The Ledger" design tokens (v2)
+   Drop-in successor to v1 tokens.css. Single source of truth:
+   every color, size, space and motion value in the UI traces here.
+   ============================================================ */
 
 :root {
-  /* ---- surfaces (dark) ---- */
-  --bg-0: #0e1116;        /* app background          */
-  --bg-1: #151a21;        /* panel / card            */
-  --bg-2: #1c232c;        /* raised row              */
-  --bg-3: #232c37;        /* hover / active row      */
-  --border: #2b3543;
-  --border-strong: #3a4654;
 
-  /* ---- text ---- */
-  --text-0: #e6ebf2;      /* primary                 */
-  --text-1: #aab4c0;      /* secondary               */
-  --text-2: #6f7d8c;      /* muted / captions        */
+  /* ---------- Paper (elevation ramp, low → high) ---------- */
+  --paper-desk:   #E7E2D6;  /* app backdrop behind the page      */
+  --paper-0:      #EFEBE2;  /* recessed wells, decided/settled   */
+  --paper-1:      #F6F3EC;  /* the page — default surface        */
+  --paper-2:      #FCFAF4;  /* raised cards, memos, inputs       */
 
-  /* ---- accent (single) ---- */
-  --accent: #4f8cff;
-  --accent-weak: rgba(79, 140, 255, 0.15);
-  --accent-text: #cfe0ff;
+  /* ---------- Ink (text ramp, strong → faint) ---------- */
+  --ink-1: #201C15;  /* headings, primary text, strong rules */
+  --ink-2: #3D372C;  /* body text                            */
+  --ink-3: #6E6553;  /* secondary text, labels               */
+  --ink-4: #9C947F;  /* metadata, hints, timestamps          */
 
-  /* ---- Owner Attention palette (6 states) ----
-   * each state: a solid foreground + a translucent fill for pills/rows.
-   * priority order: blocked > approval > needs-owner > ready > stale > none */
-  --attn-blocked: #ff5d5d;        --attn-blocked-bg: rgba(255, 93, 93, 0.14);
-  --attn-approval: #ffb84d;       --attn-approval-bg: rgba(255, 184, 77, 0.14);
-  --attn-needs-owner: #ff8a4c;    --attn-needs-owner-bg: rgba(255, 138, 76, 0.14);
-  --attn-ready: #57a6ff;          --attn-ready-bg: rgba(87, 166, 255, 0.14);
-  --attn-stale: #8b97a5;          --attn-stale-bg: rgba(139, 151, 165, 0.14);
-  --attn-none: #46c980;           --attn-none-bg: rgba(70, 201, 128, 0.14);
+  /* ---------- Rules & lines ---------- */
+  --line-hair:   #E1DAC8;  /* hairline dividers            */
+  --line-mid:    #C9C0AB;  /* input borders, chips         */
+  --line-card:   #DDD5C2;  /* card borders                 */
+  --line-strong: var(--ink-1); /* 2px section rules        */
 
-  /* ---- proof / boundary semantics ---- */
-  --proof-real: #46c980;          --proof-real-bg: rgba(70, 201, 128, 0.12);
-  --proof-sim: #d8b271;           --proof-sim-bg: rgba(216, 178, 113, 0.14);  /* SIMULATED external */
-  --boundary-bg: #1a212a;         /* persistent local-only banner */
+  /* ---------- Affordance accent (ONE accent; actions only) ---------- */
+  --accent:        #2C46C0;  /* cobalt — buttons, links, focus  */
+  --accent-press:  #1D308C;  /* active / button underside       */
+  --accent-wash:   #E9ECF8;  /* selected/tinted backgrounds     */
 
-  /* ---- lifecycle stage-rail states ---- */
-  --stage-complete: var(--attn-none);
-  --stage-active: var(--accent);
-  --stage-blocked: var(--attn-blocked);
-  --stage-idle: var(--text-2);
+  /* ---------- Status: six attention states, priority-ordered.
+       Color is never the only cue — always pair with glyph + label. */
+  --attn-blocked:      #AC3418;  --attn-blocked-wash:  #F7E9E3;  /* 1 filled diamond   */
+  --attn-approval:     #8A5A00;  --attn-approval-wash: #F6EDD8;  /* 2 filled dot       */
+  --attn-owner:        #2C46C0;  --attn-owner-wash:    #E9ECF8;  /* 3 ring + dot       */
+  --attn-review:       #1C6B47;  --attn-review-wash:   #E6F0E9;  /* 4 ring             */
+  --attn-stale:        #6E6553;  /* 5 dashed ring, dashed border, no wash */
+  --attn-none:         #6E6553;  /* 6 green check glyph, hairline border  */
 
-  /* ---- typography ---- */
-  --font-sans: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-  --font-mono: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
-  --fs-xs: 11px;
-  --fs-sm: 12px;
-  --fs-base: 13px;
-  --fs-md: 15px;
-  --fs-lg: 20px;
-  --fs-xl: 26px;
-  --lh-tight: 1.25;
-  --lh-base: 1.5;
-  --fw-regular: 400;
-  --fw-medium: 600;
-  --fw-bold: 700;
+  /* ---------- Proof pair (the honesty guarantee) ----------
+     RECORDED  = solid ink-on-green block, check glyph.
+     SIMULATED = dashed amber border + 45° hatch. The hatch NEVER
+     appears on anything real; a stamp never covers a hatch.      */
+  --proof-recorded:      #1C6B47;
+  --proof-recorded-ink:  #FCFAF4;
+  --proof-sim:           #8A5A00;
+  --proof-sim-hatch: repeating-linear-gradient(45deg, transparent 0 3px, rgba(138,90,0,.09) 3px 5px);
 
-  /* ---- spacing (4px base) ---- */
+  /* ---------- Type ---------- */
+  --font-display: 'Newsreader', Georgia, serif;          /* self-host in app */
+  --font-text:    'Instrument Sans', system-ui, sans-serif;
+  --font-mono:    'IBM Plex Mono', ui-monospace, monospace;
+
+  /* scale (px) — display / text / data */
+  --fs-hero:   46px;  /* Command Center headline (Newsreader 500) */
+  --fs-title:  38px;  /* screen titles (Newsreader 500)           */
+  --fs-h2:     25px;  /* memo titles (Newsreader 500)             */
+  --fs-body-l: 15.5px; /* row titles (Instrument 600)             */
+  --fs-body:   13.5px; /* body (Instrument 400)                   */
+  --fs-body-s: 12.5px; /* secondary (Instrument 400/500)          */
+  --fs-label:  10.5px; /* section labels, letter-spacing .14em    */
+  --fs-mono:   11px;   /* metadata (Plex Mono 400, tabular)       */
+  --fs-mono-s: 10.5px;
+  --fs-kpi:    36px;   /* standing figures (Newsreader 500, tabular) */
+
+  /* ---------- Space (4px grid) ---------- */
   --sp-1: 4px;  --sp-2: 8px;  --sp-3: 12px; --sp-4: 16px;
-  --sp-5: 20px; --sp-6: 24px; --sp-8: 32px; --sp-10: 40px;
+  --sp-5: 20px; --sp-6: 24px; --sp-7: 32px; --sp-8: 44px;
 
-  /* ---- radii / elevation ---- */
-  --r-sm: 6px;
-  --r-md: 8px;
-  --r-pill: 999px;
-  --shadow-1: 0 1px 2px rgba(0, 0, 0, 0.4);
-  --shadow-2: 0 6px 20px rgba(0, 0, 0, 0.45);
+  /* ---------- Radius (print-flat; pills are the exception) ---------- */
+  --r-chip: 3px;  --r-pill: 999px;  --r-none: 0;
 
-  /* ---- layout ---- */
-  --nav-w: 220px;
-  --banner-h: 30px;
-  --content-pad: 24px;
+  /* ---------- Elevation ---------- */
+  --shadow-page: 0 18px 60px rgba(60,50,30,.14);
+  --shadow-card: 0 2px 10px rgba(60,50,30,.07);
+  --shadow-stamp: 0 2px 8px rgba(28,107,71,.28);
+  --shadow-btn:  0 2px 0 var(--accent-press);   /* letterpress underside */
+
+  /* ---------- Motion ----------
+     hover/press 120ms · state flips 180ms · re-sorts 200ms · stamp 500ms
+     Nothing bounces except the stamp's single settle.             */
+  --ease-out:   cubic-bezier(.2, 0, 0, 1);
+  --ease-stamp: cubic-bezier(.2, 1.4, .45, 1);
+  --t-hover: 120ms; --t-state: 180ms; --t-sort: 200ms; --t-stamp: 500ms;
+
+  /* ---------- Focus ---------- */
+  --focus-ring: 2px solid var(--accent);
+  --focus-offset: 2px;
 }
-
-/* Helper: map an attention-state key to its tokens via a data attribute.
- * Usage: <span class="pill" data-attn="blocked">Blocked</span> */
-.pill[data-attn="blocked"]      { color: var(--attn-blocked);     background: var(--attn-blocked-bg); }
-.pill[data-attn="approval"]     { color: var(--attn-approval);    background: var(--attn-approval-bg); }
-.pill[data-attn="needs-owner"]  { color: var(--attn-needs-owner); background: var(--attn-needs-owner-bg); }
-.pill[data-attn="ready"]        { color: var(--attn-ready);       background: var(--attn-ready-bg); }
-.pill[data-attn="stale"]        { color: var(--attn-stale);       background: var(--attn-stale-bg); }
-.pill[data-attn="none"]         { color: var(--attn-none);        background: var(--attn-none-bg); }

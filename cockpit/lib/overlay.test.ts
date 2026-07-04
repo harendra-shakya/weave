@@ -40,7 +40,7 @@ describe("overlay persistence", () => {
     expect(reread.gates["habit-tracker__connect-linear-write"].decision).toBe("approved");
   });
 
-  it("appends a SIMULATED event for an external-effect approval — never a real one", async () => {
+  it("appends a SIMULATED gate.approved event and an effect.simulated event — never real ones", async () => {
     const o = await recordGateDecision(file, {
       gateId: "habit-tracker__connect-linear-write",
       appId: "habit-tracker",
@@ -48,10 +48,14 @@ describe("overlay persistence", () => {
       decision: "approved",
       blastRadius: "MEDIUM",
     });
-    const evt = o.events.at(-1)!;
-    expect(evt.simulated).toBe(true);
-    expect(evt.event).toBe("gate.approved");
-    expect(evt.app_id).toBe("habit-tracker");
+    // Two events: gate.approved then effect.simulated — both marked simulated.
+    const decision = o.events.at(-2)!;
+    expect(decision.simulated).toBe(true);
+    expect(decision.event).toBe("gate.approved");
+    expect(decision.app_id).toBe("habit-tracker");
+    const effect = o.events.at(-1)!;
+    expect(effect.simulated).toBe(true);
+    expect(effect.event).toBe("effect.simulated");
   });
 
   it("records a blocker acknowledgement", async () => {

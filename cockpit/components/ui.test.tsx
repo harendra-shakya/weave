@@ -1,50 +1,67 @@
 import { describe, it, expect } from "vitest";
 import { render, screen } from "@testing-library/react";
-import { AttentionPill, StageRail, MirrorBadge, NonClaims } from "./ui";
+import { AttentionPill, ProofTag, MirrorBadge, StageRail } from "./ui";
 import type { LifecycleStage } from "@/lib/types";
 
 describe("AttentionPill", () => {
-  it("renders the canonical label and data-attn for a state", () => {
+  it("renders the Ledger glyph + label and data-attn for approval", () => {
     const { container } = render(<AttentionPill state="approval" />);
-    expect(screen.getByText("Approval required")).toBeInTheDocument();
+    expect(screen.getByText(/● APPROVAL/)).toBeInTheDocument();
     expect(container.querySelector('[data-attn="approval"]')).not.toBeNull();
   });
 
-  it("renders blocked with the blocked data-attn", () => {
+  it("renders blocked with the blocked data-attn and glyph", () => {
     const { container } = render(<AttentionPill state="blocked" />);
+    expect(screen.getByText(/◆ BLOCKED/)).toBeInTheDocument();
     expect(container.querySelector('[data-attn="blocked"]')).not.toBeNull();
+  });
+
+  it("renders needs-owner with data-attn needs-owner", () => {
+    const { container } = render(<AttentionPill state="needs-owner" />);
+    expect(screen.getByText(/◉ NEEDS OWNER/)).toBeInTheDocument();
+    expect(container.querySelector('[data-attn="needs-owner"]')).not.toBeNull();
+  });
+
+  it("renders stale with dashed data-attn", () => {
+    const { container } = render(<AttentionPill state="stale" />);
+    expect(container.querySelector('[data-attn="stale"]')).not.toBeNull();
   });
 });
 
-describe("StageRail", () => {
-  it("renders every stage with its proof dot", () => {
-    const stages: LifecycleStage[] = [
-      { stage: "intent", label: "Intent", state: "complete", proof_state: "recorded" },
-      { stage: "deployment", label: "Deployment", state: "active", proof_state: "missing" },
-    ];
-    const { container } = render(<StageRail stages={stages} />);
-    expect(screen.getByText("Intent")).toBeInTheDocument();
-    expect(screen.getByText("Deployment")).toBeInTheDocument();
-    expect(container.querySelectorAll(".dot")).toHaveLength(2);
+describe("ProofTag", () => {
+  it("renders RECORDED tag with data-proof recorded", () => {
+    const { container } = render(<ProofTag kind="recorded" />);
+    expect(screen.getByText(/✓ RECORDED/)).toBeInTheDocument();
+    expect(container.querySelector('[data-proof="recorded"]')).not.toBeNull();
+  });
+
+  it("renders SIMULATED tag with data-proof simulated", () => {
+    const { container } = render(<ProofTag kind="simulated" />);
+    expect(screen.getByText(/SIMULATED/)).toBeInTheDocument();
+    expect(container.querySelector('[data-proof="simulated"]')).not.toBeNull();
   });
 });
 
 describe("MirrorBadge", () => {
-  it("labels the tool as a Mirror and not source of truth", () => {
-    render(<MirrorBadge mirror={{ tool: "Linear", kind: "Mirror", connection: "disconnected" }} />);
-    expect(screen.getByText(/Linear · Mirror — not source of truth/)).toBeInTheDocument();
+  it("labels the tool as a mirror with the MIRROR badge", () => {
+    render(<MirrorBadge tool="Linear" />);
+    expect(screen.getByText(/MIRROR · Linear/)).toBeInTheDocument();
   });
 });
 
-describe("NonClaims", () => {
-  it("renders the non-claims list under a 'Not proven' label", () => {
-    render(<NonClaims items={["does not prove deployment", "does not store secrets"]} />);
-    expect(screen.getByText("Not proven")).toBeInTheDocument();
-    expect(screen.getByText("does not prove deployment")).toBeInTheDocument();
-  });
-
-  it("renders nothing when there are no items", () => {
-    const { container } = render(<NonClaims items={[]} />);
-    expect(container.firstChild).toBeNull();
+describe("StageRail", () => {
+  it("renders every stage with its label and proof state", () => {
+    const stages: LifecycleStage[] = [
+      { stage: "intent", label: "Intent", state: "complete", proof_state: "recorded" },
+      { stage: "engineering", label: "Engineering", state: "active", proof_state: "missing" },
+      { stage: "qa", label: "QA", state: "not_started", proof_state: "not_required_yet" },
+    ];
+    render(<StageRail stages={stages} />);
+    expect(screen.getByText("Intent")).toBeInTheDocument();
+    expect(screen.getByText("Engineering")).toBeInTheDocument();
+    expect(screen.getByText("QA")).toBeInTheDocument();
+    // done stage shows ✓ in circle, active shows NO PROOF label
+    expect(screen.getByText("PROOF ✓")).toBeInTheDocument();
+    expect(screen.getByText("NO PROOF")).toBeInTheDocument();
   });
 });
