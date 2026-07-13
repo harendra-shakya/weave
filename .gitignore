@@ -19,3 +19,6 @@ evidence/
 .workflow/
 
 design_handoff_ledger_cockpit/
+
+# personal Claude Code agents — not part of the shared project config
+.claude/agents/
