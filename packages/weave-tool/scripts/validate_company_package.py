@@ -22,6 +22,8 @@ REQUIRED_SKILLS = {
     "primitive-market-research",
     "qa-verification",
     "security-release-review",
+    "weave-application-lifecycle",
+    "weave-guided-intake",
     "weave-lifecycle",
 }
 REQUIRED_EVALS = {

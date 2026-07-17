@@ -24,7 +24,7 @@ class WeaveCompanyPackageTests(unittest.TestCase):
 
         self.assertEqual(summary.slug, "weave")
         self.assertEqual(summary.version, "0.1.0")
-        self.assertEqual(summary.skill_count, 10)
+        self.assertEqual(summary.skill_count, 12)
         self.assertGreaterEqual(summary.primitive_count, 11)
         self.assertEqual(summary.eval_contract_count, 12)
 

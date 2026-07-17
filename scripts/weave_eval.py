@@ -637,6 +637,12 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--run-gates", action="store_true", help="execute command hard gates")
     parser.add_argument("--strict", action="store_true", help="exit non-zero unless decision can advance")
     parser.add_argument("--json", action="store_true", help="print machine-readable JSON")
+    parser.add_argument(
+        "--app-path",
+        type=Path,
+        default=None,
+        help="run command/file gates against this app repo root instead of the WEAVE repo",
+    )
     return parser
 
 
@@ -656,7 +662,8 @@ def main(argv: list[str] | None = None, *, output: TextIO = sys.stdout) -> int:
             return 0
         review = load_review(args.review_file)
         validate_review_binding(contract, review, artifact=args.artifact)
-        gates = evaluate_gates(contract, run_gates=args.run_gates, repo_root=REPO_ROOT, review=review)
+        gate_root = args.app_path.resolve() if args.app_path else REPO_ROOT
+        gates = evaluate_gates(contract, run_gates=args.run_gates, repo_root=gate_root, review=review)
         score = score_review(contract, review)
         decision, blockers, next_actions = decide(contract, gates, score)
         payload = result_payload(

@@ -1,0 +1,40 @@
+{
+  "_template_note": "Copy to apps/<app-id>/lifecycle/lifecycle-state.json and fill in app_id. Remove this field.",
+  "app_id": "<app-id>",
+  "current_stage": "intent",
+  "mode": "loop",
+  "schema": "weave-cos-lifecycle/v0.1",
+  "deployment_gates": {
+    "blocked_by_provider_access": true,
+    "launch_allowed": false,
+    "local_progress_allowed": true,
+    "non_claims": [
+      "does not prove provider account access",
+      "does not prove deployment target access",
+      "does not prove DNS or domain authority",
+      "does not request or store raw API keys, cookies, private keys, session values, or other raw secrets"
+    ],
+    "state": "deployment_blocked_until_provider_access_validated"
+  },
+  "stages": [
+    { "stage": "intent",      "state": "not_started", "proof_state": "not_required_yet" },
+    { "stage": "research",    "state": "not_started", "proof_state": "not_required_yet" },
+    { "stage": "selection",   "state": "not_started", "proof_state": "not_required_yet" },
+    { "stage": "plan",        "state": "not_started", "proof_state": "not_required_yet" },
+    { "stage": "engineering", "state": "not_started", "proof_state": "not_required_yet" },
+    { "stage": "qa",          "state": "not_started", "proof_state": "not_required_yet" },
+    { "stage": "deployment",  "state": "not_started", "proof_state": "not_required_yet" },
+    { "stage": "kpi-setup",   "state": "not_started", "proof_state": "not_required_yet" },
+    { "stage": "marketing",   "state": "not_started", "proof_state": "not_required_yet" },
+    { "stage": "iteration",   "state": "not_started", "proof_state": "not_required_yet" },
+    { "stage": "analysis",    "state": "not_started", "proof_state": "not_required_yet" }
+  ],
+  "non_claims": [
+    "does not prove Codex app-server execution",
+    "does not prove live tracker or Linear mutation",
+    "does not prove public deployment, billing, or public send",
+    "does not prove full lifecycle completion",
+    "does not access credentials or secret values"
+  ],
+  "updated_at": "<ISO-8601>"
+}

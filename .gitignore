@@ -11,3 +11,11 @@ build/
 runs/
 evidence/
 .workflow/
+
+# Personal /teach learning workspace (not part of the product)
+/MISSION.md
+/GLOSSARY.md
+/RESOURCES.md
+/learning-records/
+/explainers/
+/limitations-and-future-improvements.md

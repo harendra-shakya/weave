@@ -205,6 +205,8 @@ def build_parser() -> argparse.ArgumentParser:
     eval_parser.add_argument("--run-gates", action="store_true")
     eval_parser.add_argument("--strict", action="store_true")
     eval_parser.add_argument("--json", action="store_true")
+    eval_parser.add_argument("--app-path", type=Path, default=None,
+                             help="run command/file gates against this app repo root instead of the WEAVE repo")
     return parser
 
 
@@ -245,6 +247,8 @@ def eval_command(args: argparse.Namespace, output: TextIO) -> int:
         eval_args.append("--strict")
     if args.json:
         eval_args.append("--json")
+    if args.app_path:
+        eval_args.extend(["--app-path", str(args.app_path)])
     return weave_eval.main(eval_args, output=output)
 
 

@@ -1,0 +1,18 @@
+{
+  "schema": "weave-skill-registry/v1",
+  "description": "Platform skills to invoke at each lifecycle stage. WEAVE references these; the agent invokes them. No new skill files are required for this registry — the named skills are platform skills already installed in the operating environment. Read by the lifecycle runner, which emits a stage's skills as a SUGGESTED SKILLS section in the stage prompt. Keys match STAGE_ORDER in runner/lifecycle-runner.mjs, with one exception: 'pre-intent' is not a lifecycle stage — it is a guided-mode-only phase consumed by the runner's pre-intent gate, which runs weave-guided-intake before the intent stage. A stage with no key here simply gets no SUGGESTED SKILLS section; the runner tolerates the gap rather than failing.",
+  "stages": {
+    "pre-intent": ["brand-ideation", "grill-me"],
+    "intent":     ["grill-me", "to-prd"],
+    "research":   ["primitive-market-research", "grill-with-docs", "analytics-strategy"],
+    "selection":  ["information-architecture", "design-an-interface"],
+    "plan":       ["to-prd", "prototype", "design-system"],
+    "engineering":["frontend-component-build", "tdd", "performance-optimization", "improve-codebase-architecture", "setup-pre-commit"],
+    "qa":         ["qa", "accessibility-audit", "security-review", "impeccable"],
+    "deployment": ["security-release-review", "security-review"],
+    "kpi-setup":  ["analytics-strategy", "cro-optimization"],
+    "marketing":  ["content-strategy", "landing-page-copy", "email-sequences", "brand-voice"],
+    "iteration":  ["cro-optimization", "analytics-strategy"],
+    "analysis":   ["evidence-packet", "handoff"]
+  }
+}
