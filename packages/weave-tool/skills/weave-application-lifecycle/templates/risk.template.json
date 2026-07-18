@@ -1,0 +1,29 @@
+{
+  "_template_note": "Fill in before or during the plan stage. Remove this field when complete. A risk not named here cannot be cited as a reason to halt the lifecycle later — name it now while you can still decide whether to proceed.",
+  "schema": "weave-lifecycle-risk/v0.1",
+  "app_id": "<app-id>",
+  "assessed_at": "<ISO-8601>",
+  "risks": [
+    {
+      "id": "risk-01",
+      "category": "<market | technical | legal | operational | financial>",
+      "description": "<what could go wrong>",
+      "likelihood": "<high | medium | low>",
+      "impact":     "<high | medium | low>",
+      "mitigation": "<what you will do if this happens>",
+      "owner_gate_required": false,
+      "current_status": "open"
+    }
+  ],
+  "stop_conditions": {
+    "engineering_required": [
+      "<describe: what technical problem would require an engineer to unblock>"
+    ],
+    "owner_gate": [
+      "<describe: what decision or access would require owner approval>"
+    ]
+  },
+  "non_claims": [
+    "<explicit statement of what this risk assessment does NOT cover>"
+  ]
+}
