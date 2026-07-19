@@ -12,7 +12,7 @@ const STAGE_ORDER = [
 ];
 
 const VALID_STATES = new Set([
-  'not_started', 'in_progress', 'verified', 'owner_gated_not_pursued',
+  'not_started', 'in_progress', 'verified', 'owner_gated_not_pursued', 'engineering_required',
 ]);
 
 export function validate(filePath) {

@@ -315,6 +315,41 @@ test('proof: a verified stage with no eval_result_ref is out of scope, not a pas
   assert.equal(code, 0, 'known limitation: no ref means nothing to check against');
 });
 
+// -- engineering_required: a real place to record a stop (F11) ----------------
+
+// Before this state value existed, an operator who hit a blocked gate had no
+// way to record that on disk — the runner only recognized `verified` and
+// `owner_gated_not_pursued` as terminal. That pressure is exactly what
+// produced ATM-422's disclosed override ("without that override, this run
+// does not reach closeout"). These drive the real binary.
+test('engineering_required: runner stops and exits non-zero, not reported as PROOF MISSING', () => {
+  // A stage can be engineering_required with no eval_result_ref at all — there is
+  // no proof yet, that's the point. It must stop cleanly on its own terms, not
+  // get misreported as a ghost-app integrity failure.
+  const state = freshState();
+  state.stages[0].state = 'engineering_required'; // intent — no prior stage in the way
+  const { code, out } = runFixtureExpectingFailure(state);
+  assert.equal(code, 1, 'must exit non-zero — this is a stop, not a warning');
+  assert.match(out, /ENGINEERING REQUIRED/);
+  assert.match(out, /stage: INTENT/);
+  assert.ok(!out.includes('PROOF MISSING'));
+  assert.ok(!out.includes('ALL STAGES COMPLETE'));
+});
+
+test('engineering_required: reached only after earlier stages verify, names the correct stage', () => {
+  // Earlier stages verified (with real proof) must not mask a later stop, and
+  // the notice must name the actual blocked stage, not just any stage.
+  const proofFiles = STAGE_ORDER
+    .filter((s) => !OWNER_GATED.has(s) && s !== 'qa')
+    .map((s) => `proof/${s}-eval-result.json`);
+  const state = ghostState();
+  state.stages.find((s) => s.stage === 'qa').state = 'engineering_required';
+  const { code, out } = runFixtureExpectingFailure(state, { proofFiles });
+  assert.equal(code, 1);
+  assert.match(out, /ENGINEERING REQUIRED/);
+  assert.match(out, /stage: QA/);
+});
+
 // -- skill registry ------------------------------------------------------------
 
 test('registry: stage prompt names the stage\'s platform skills', () => {

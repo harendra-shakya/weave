@@ -85,6 +85,12 @@ function nextStage(state) {
   for (const stageName of STAGE_ORDER) {
     const entry = state.stages.find((s) => s.stage === stageName);
     if (!entry) continue;
+    if (entry.state === 'engineering_required') {
+      // A stop the lifecycle cannot cross without an engineer (F11). Before this
+      // state value existed, the only way to record this stop was to overrule a
+      // blocked gate and mark the stage verified anyway — see ATM-422.
+      return { ...entry, _engineering_required: true };
+    }
     if (OWNER_GATED.has(stageName)) {
       // If owner-gated and not yet decided, report it but don't block non-gated stages.
       if (entry.state !== 'verified' && entry.state !== 'owner_gated_not_pursued') {
@@ -116,6 +122,24 @@ Once the owner has approved, update lifecycle-state.json:
 
 Or, if the owner explicitly chooses not to pursue this stage:
   "${stageEntry.stage}": { "state": "owner_gated_not_pursued" }
+
+Then re-run the lifecycle runner to continue.
+`.trim();
+}
+
+function buildEngineeringRequiredNotice(appId, stageEntry) {
+  return `
+ENGINEERING REQUIRED — stage: ${stageEntry.stage.toUpperCase()}
+App: ${appId}
+
+This stage cannot proceed without work outside the lifecycle's own competence —
+a code change, adapter, schema migration, or fix the skill cannot produce from
+evidence alone. The loop stops here; it does not downgrade this to a warning.
+
+What is needed:
+  - An engineer resolves the blocker (see this stage's proof/blocker record)
+  - Update lifecycle-state.json once resolved:
+    "${stageEntry.stage}": { "state": "verified", "eval_result_ref": "proof/${stageEntry.stage}-eval-result.json" }
 
 Then re-run the lifecycle runner to continue.
 `.trim();
@@ -282,6 +306,12 @@ function main() {
 
   if (!next) {
     console.log(`ALL STAGES COMPLETE — ${args.app} is ready to seal and close.`);
+    return;
+  }
+
+  if (next._engineering_required) {
+    console.error(buildEngineeringRequiredNotice(args.app, next));
+    process.exitCode = 1;
     return;
   }
 

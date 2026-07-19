@@ -10,8 +10,8 @@
   "description": "Evaluate whether implementation is correct, maintainable, tested, and trust-boundary safe.",
   "hard_gates": [
     {
-      "command": "python3 -m unittest discover -s tests -p 'test_*.py'",
-      "description": "Full Python unit suite passes.",
+      "command": "if [ -f package.json ]; then npm test; else python3 -m unittest discover -s tests -p 'test_*.py'; fi",
+      "description": "Full test suite passes (npm test for a Node/JS app, else Python unittest discovery).",
       "id": "unit_tests_pass",
       "kind": "command",
       "timeout_seconds": 300

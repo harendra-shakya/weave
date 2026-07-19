@@ -88,6 +88,14 @@ test('validate: invalid state value is an error', () => {
   assert.ok(errors.some((e) => e.includes('done')));
 });
 
+test('validate: engineering_required is a valid state', () => {
+  const s = validState();
+  s.stages[4] = { stage: 'engineering', state: 'engineering_required' };
+  const { fp } = tmpFile(s);
+  const { errors } = validate(fp);
+  assert.equal(errors.length, 0);
+});
+
 test('validate: verified without eval_result_ref is a warning, not error', () => {
   const s = validState();
   s.stages[0] = { stage: 'intent', state: 'verified' }; // no eval_result_ref

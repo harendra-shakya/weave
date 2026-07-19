@@ -15,7 +15,13 @@ import subprocess
 import sys
 from pathlib import Path
 
-REPO_ROOT = Path(__file__).resolve().parents[1]
+SELF_PATH = Path(__file__).resolve()
+# The eval engine invokes this with `cwd` set to the target being scanned (the
+# WEAVE repo itself, or an app repo via `--app-path`). Scanning cwd instead of
+# this script's own parent is what makes `--app-path` actually work — see F10
+# (ATM-422): before this, every app's "no_secret_leakage: passed" only ever
+# scanned the weave-tool repo, never the app it was pointed at.
+REPO_ROOT = Path.cwd()
 
 # File extensions to scan.
 SCAN_EXTENSIONS = {
@@ -26,6 +32,12 @@ SCAN_EXTENSIONS = {
 
 # Filenames to scan regardless of extension.
 SCAN_FILENAMES = {".env", ".envrc", "Makefile", "Dockerfile"}
+
+# Source-code extensions where a lowercase local (e.g. `seed`, `token_configured`)
+# is normal variable naming, not an ENV-style secret assignment. Config/env-style
+# files (.env, .yaml, .json, .sh) are excluded on purpose — a lowercase key there
+# usually *is* the actual assignment.
+CODE_EXTENSIONS = {".py", ".mjs", ".js", ".ts", ".tsx", ".jsx"}
 
 # Directories to skip entirely.
 SKIP_DIRS = {
@@ -108,7 +120,7 @@ PATTERNS: list[tuple[re.Pattern[str], str]] = [
 
 def should_scan(path: Path) -> bool:
     # Skip this script itself to avoid false positives from pattern definitions.
-    if path.resolve() == Path(__file__).resolve():
+    if path.resolve() == SELF_PATH:
         return False
     return path.suffix in SCAN_EXTENSIONS or path.name in SCAN_FILENAMES
 
@@ -138,15 +150,25 @@ def scan_file(path: Path) -> list[str]:
             m = pattern.search(line)
             if not m:
                 continue
-            if label == "secret-assignment" and path.suffix == ".py":
+            if label == "secret-assignment" and path.suffix in CODE_EXTENSIONS:
                 lhs = m.group(1)
-                # The assignment pattern is for ENV-style keys. Lowercase Python
-                # locals such as token_configured/auth_token are not secret
-                # material; actual provider-shaped values are still caught by
-                # SECRET_VALUE_RE above.
+                # The assignment pattern is for ENV-style keys. A lowercase local
+                # in source code (Python, JS, TS) — e.g. `seed`, `token_configured`,
+                # `const seed = parseInt(...)` — is not secret material; actual
+                # provider-shaped values are still caught by SECRET_VALUE_RE above.
+                # F10 follow-up: this exemption used to be Python-only, so the same
+                # class of false positive (a `seed` PRNG argument) tripped this gate
+                # on every .mjs file the moment `--app-path` made it actually run.
                 if lhs != lhs.upper():
                     continue
                 if lhs.endswith("_RE") and "re.compile" in line:
+                    continue
+                if m.group(3).startswith("/"):
+                    # A value starting with a bare slash is a regex literal
+                    # (JS/TS `const TOKEN_PATTERN = /^TOK-.../;`), not a secret.
+                    # Same F10 follow-up: this is what --app-path now actually
+                    # scans, and the sealed apps' token-format regexes are
+                    # exactly this shape.
                     continue
             hits.append(f"{path}:{lineno}:{label}:{m.group(0)[:60]!r}")
             break  # one hit per line is enough

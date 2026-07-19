@@ -1,0 +1,23 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "video-storefront",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev", "--workspace", "apps/video-storefront", "--prefix", "P:/Development/Projects/weave-v5-apps"],
+      "port": 3000
+    },
+    {
+      "name": "sticker-storefront",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev", "--workspace", "apps/sticker-storefront", "--prefix", "P:/Development/Projects/weave-v5-apps"],
+      "port": 3001
+    },
+    {
+      "name": "nft-storefront",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev", "--workspace", "apps/nft-storefront", "--prefix", "P:/Development/Projects/weave-v5-apps"],
+      "port": 3002
+    }
+  ]
+}

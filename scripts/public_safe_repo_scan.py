@@ -16,7 +16,12 @@ from dataclasses import dataclass
 from pathlib import Path
 
 
-REPO_ROOT = Path(__file__).resolve().parents[1]
+SELF_PATH = Path(__file__).resolve()
+# Same fix as F10 (check_no_secrets.py): the eval engine invokes this with
+# `cwd` set to the target being scanned (the WEAVE repo, or an app repo via
+# `--app-path`). Scanning cwd instead of this script's own parent is what
+# makes `--app-path` actually work for the qa stage's public_safe_scan_pass gate.
+REPO_ROOT = Path.cwd()
 
 SCAN_EXTENSIONS = {
     ".css",

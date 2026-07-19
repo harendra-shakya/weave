@@ -153,6 +153,30 @@ When all non-owner-gated stages are complete, the runner prints:
 | iteration | Adaptation applied, measurement rerun, GO/ITERATE/PIVOT/STOP decision |
 | analysis | Analysis doc, trajectory summary, next investment decision |
 
+## Deterministic Measurement (kpi-setup / iteration)
+
+`kpi-setup` and every later stage depend on one property: **the same seed
+produces the same event stream, every time.** That is what makes a baseline
+freezable and a retest meaningful — if the retest cannot reproduce the
+baseline's own numbers on the same seed, nothing it reports about an
+adaptation can be trusted either.
+
+- `tools/generate-events.mjs --seed <int> --count <int> [--schema <path>] [--output <path>]`
+  generates the synthetic feedback/funnel/order/refund event stream. The
+  default funnel is `view → engage → convert → fulfill → refund`; pass
+  `--schema` (see `examples/event-schema.example.json`) to model a different
+  funnel. Same seed, same `--count`, same schema → byte-identical output,
+  every run.
+- **Digest** means a checksum of that output — hash the generated events file
+  (or run `tools/seal.mjs` over the directory containing it) once for the
+  frozen baseline and again after the retest. Identical seed, identical
+  digest is the proof the retest reran the same stream; a differing digest on
+  an identical seed means something non-deterministic leaked in and the
+  comparison is invalid until that is fixed.
+- `tools/kpi-compare.mjs --baseline <path> --current <path>` reports the delta
+  between two KPI snapshots computed from those event streams — this is what
+  the iteration stage's GO/ITERATE/PIVOT/STOP decision is based on.
+
 ## Stop Conditions
 
 A stop is recorded, not worked around. Every stop is one of two kinds, and the
@@ -162,6 +186,12 @@ record must name which:
 |------|-------|-----------------|
 | `ENGINEERING_REQUIRED` | The lifecycle cannot proceed without work outside its competence — a code change, adapter, schema migration, or security fix the skill cannot produce from evidence alone. | An engineer |
 | `OWNER_GATE` | The lifecycle is blocked on a decision or access only the owner holds — approval, credentials, provider access, or an amendment to something already frozen. | The owner |
+
+Record `ENGINEERING_REQUIRED` by setting that stage's `state` to
+`engineering_required` in `lifecycle-state.json` (not `verified`, and not left
+`in_progress`). The runner recognizes this state, stops there, and tells the
+next operator what is blocked — it does not let the loop continue past it,
+and it does not require overruling a failed gate to record the stop.
 
 Stop and emit the matching record when:
 
