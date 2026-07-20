@@ -113,7 +113,14 @@ to the next non-gated stage, flagging them for the owner.
 3. If that stage is owner-gated, stop. Emit an owner action request with what
    is needed (provider access, approval record, etc.) and which stage is blocked.
 4. Load the stage-entry contract for that stage.
-5. Perform the stage work according to the eval rubric and procedure.
+5. Perform the stage work according to the eval rubric and procedure. `engineering`
+   and `qa` have hard command gates that actually execute — run them with:
+   ```sh
+   python3 scripts/weave_eval.py <stage> --run-gates --app-path <path-to-your-app>
+   ```
+   Omit `--app-path` only when the app lives inside the weave-tool repo itself.
+   Pointing it at your app's root is what makes the test/build/scan commands
+   run against your app instead of the weave-tool repo.
 6. Write proof to `proof/<stage>-eval-result.json` (or the path the eval specifies).
 7. Update `lifecycle-state.json`: set `state` to `verified`, add `eval_result_ref`
    and `eval_score_percent`.
