@@ -102,6 +102,10 @@ to the next non-gated stage, flagging them for the owner.
 - Non-claims must be recorded whenever a stage proves less than it appears to.
 - A stage is not verified until its eval score meets the minimum threshold
   defined in the eval YAML (`advance_min_score_percent`).
+- Each stage proof artifact must record a `proof_date` (ISO-8601). A stage
+  whose `proof_date` postdates the following stage's first commit is
+  `engineering_required`, not `verified` — a retrospectively written proof is
+  documentation, and documentation is not a gate.
 
 ## Procedure
 
