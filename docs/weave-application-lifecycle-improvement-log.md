@@ -273,3 +273,68 @@ The `python scripts/weave_eval.py --run-gates` runner uses bash conditionals (`i
 2. **Shared-package `tsc --noEmit` gate** — would catch the `auth.mjs` class of bug at the source rather than at consuming-app build time.
 3. **Windows gate runner cross-platform compatibility** — extends Entry 001 #1; blocks automated gate execution on Windows.
 4. **Seller dashboard test coverage** — the `sell/listings/[id]/edit` import bug was not caught by any automated gate. The edit page's import paths are a structural invariant (it's deeper than `new/`), not a typo; the gate should have caught it.
+
+---
+
+## Entry 004 — 2026-07-23 — ATM-417 fresh build: impeccable as required QA gate, confirmed findings
+
+### What was done
+
+Fresh build of `video-storefront` (OneReel — The Patron's Channel) from scratch. Ran the complete lifecycle through analysis + seal. 61 files sealed at 164785a4. Stages by score: engineering 91.67% (22/24) · qa 90.0% (18/20) · kpi-setup 100% · iteration 93.75% (15/16) · analysis 100%. All stages advanced on documented evidence.
+
+### Findings
+
+#### Finding A — Improvement #4 confirmed: impeccable as required QA gate works
+
+`qa.yaml` required_inputs now includes impeccable critique. Used `/impeccable critique` in this cycle; produced Nielsen 30/40 (75%), zero P0 findings, 2 P1 / 2 P2 / 1 P3 documented. This is a concrete scored artifact (not a suggestion): the score is machine-readable, P0 count is a binary blocker, and the finding list is a backlog for the next cycle. The gate works exactly as intended in Entry 002.
+
+**Remaining gap:** assessment B (CLI detector + browser visualization) was degraded — sub-agent interrupted, ran inline. The degraded banner (`⚠️ DEGRADED`) was emitted per the skill's protocol. The inline CLI scan did return zero findings (exit 0, `[]`). Screenshot evidence was unavailable (browser pane not displayable in this session). This reduced evidence_quality from 4 to 3 in the QA rubric. A session where the browser pane is displayable would have returned screenshots as the primary visual evidence and enabled both sub-agents.
+
+#### Finding B — Synthetic cohort is copy-agnostic (Entry 001 §5 re-confirmed at bounded-adaptation scope)
+
+The `bounded_adaptation_candidate` in `video-storefront.spec.json` defined "CTA 'Back this film' vs 'Buy film' — conversion_rate delta, seed=42 cohort." Applied the change, ran the cohort: identical results (events=368, 13.0%, $5.72, 3.8%, no breach). Delta: 0.0%.
+
+Root cause: cohort runner uses mulberry32 PRNG against the spec's funnel probability table — it has no representation of UI copy. Changing text in `PaymentForm.tsx` and `BackFilmButton.tsx` cannot influence any simulated event probability. This confirms Entry 001 §5 ("the measurement loop cannot see the product's actual failure modes") at the copy-sensitivity level. Any bounded adaptation experiment that changes labels, button text, heading copy, or UX copy will produce a forced 0.0% delta and a structurally uninformative ITERATE verdict.
+
+**Proposed change (refines Entry 003 Finding A / ATM-420 candidate):** Per-app elasticity parameters in the spec (e.g., `cta_conversion_lift: 0.03` for "Buy film" variant) would let the cohort model hypothetical copy effects with explicit synthetic assumptions, making the ITERATE verdict informative rather than forced.
+
+#### Finding C — Next.js 15 vs 14 API mismatch in plan review
+
+Plan review specified "Next.js 14." Source UI (`docs/atm-415/ui/onereel`) uses `params: Promise<{ id: string }>` — the Next.js 15 async params API. Building with Next.js 14 would cause TypeScript errors; correcting to 15 was necessary. The plan stage review must check the actual params API pattern in the UI source, not assume a major version.
+
+**Proposed change:** Add a check to engineering eval rubric (or plan required_inputs): "Verify Next.js version against source UI's params API pattern before committing to a version in the plan."
+
+#### Finding D — Windows CI gate portability continues (unchanged from Entry 003)
+
+`unit_tests_pass` uses `if [ -f package.json ]; then ...` (bash), `no_secret_leakage` uses `python3` — both fail on Windows cmd.exe. All three apps in this sprint will hit this. Gates verified manually; documented in INTERVENTION_LEDGER each time.
+
+No change from Entry 003 Finding C. Still the highest-priority open item (#1 in Entry 001 ranked list). Still unresolved.
+
+### Scores by stage
+
+| Stage | Score | Gate status |
+|---|---|---|
+| intent | 100% | prior verified |
+| research | 100% | prior verified |
+| selection | 100% | prior verified |
+| plan | 100% | prior verified |
+| engineering | 91.67% (22/24) | build_exits_0 ✓ · contracts_valid ✓ · diff_check_clean ✓ · unit_tests_pass manual · no_secret_leakage manual |
+| qa | 90.0% (18/20) | cos_bootstrap_smoke ✓ · package_validation ✓ · public_safe_scan manual |
+| kpi-setup | 100% (16/16) | both manual gates passed |
+| iteration | 93.75% (15/16) | both manual gates passed; learning_capture 3/4 |
+| analysis | 100% (16/16) | both manual gates passed |
+
+### What held up well
+
+- `validate-contracts.mjs` exit 0 after full build — frozen contracts intact throughout
+- impeccable CLI detector exit 0 — no forbidden patterns in the source
+- Deterministic cohort: two seed=42 runs identical (events=368, 13.0%, $5.72, 3.8%)
+- All 5 synthetic nonclaims present on all transaction surfaces throughout
+- Cognitive load 8/8: every screen has exactly one primary action
+
+### Open items from this cycle
+
+1. **Copy-sensitivity elasticity in cohort runner** — per-app spec parameters; ATM-420 candidate
+2. **Windows gate runner cross-platform** — extends Entry 001 #1; third occurrence in this log
+3. **Next.js version assertion in plan required_inputs** — low-cost documentation fix
+4. **ATM-418 (Marginalia) and ATM-419 (Vitrine)** — apply learnings L1–L4 from this cycle

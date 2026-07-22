@@ -22,7 +22,7 @@
     {
       "name": "video-storefront",
       "runtimeExecutable": "npm",
-      "runtimeArgs": ["run", "dev", "--workspace", "apps/video-storefront", "--prefix", "P:/Development/Projects/weave-v5-apps", "--", "--port", "3004"],
+      "runtimeArgs": ["run", "dev", "--prefix", "P:/Development/Projects/weave-v5-apps/apps/video-storefront", "--", "--port", "3004"],
       "port": 3004
     }
   ]
