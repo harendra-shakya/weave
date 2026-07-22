@@ -338,3 +338,75 @@ No change from Entry 003 Finding C. Still the highest-priority open item (#1 in 
 2. **Windows gate runner cross-platform** — extends Entry 001 #1; third occurrence in this log
 3. **Next.js version assertion in plan required_inputs** — low-cost documentation fix
 4. **ATM-418 (Marginalia) and ATM-419 (Vitrine)** — apply learnings L1–L4 from this cycle
+
+---
+
+## Entry 005 — 2026-07-23 — ATM-418 Marginalia (sticker-storefront): impeccable as required gate, dual-agent pattern, a11y findings
+
+### What was done
+
+Full lifecycle (intent → seal) for `sticker-storefront` (Marginalia). 12 Next.js 15 App Router routes, Vinyl Pop design system (hard offset shadows, candy pills, badge-tilt), variant cart (size × finish × sheet count), fulfillment state machine, artist upload + curator review queue. Sealed 53 files @ 86766633. Dual-agent impeccable QA critique (Assessment A: design review; Assessment B: detector + browser). Cohort seed=42: CR=13.5%, AOV=$12.85, refund=7.4%, no guardrail breach. Iteration adaptation: variant-clarity (price deltas + finish descriptions in VariantSelector pills).
+
+### Findings
+
+#### Finding A — Dual-agent impeccable pattern executed cleanly; 0 slop, 1 P1 reclassified
+
+Assessment A (design review) + Assessment B (detector + browser) ran in parallel as sub-agents. CLI detector exit 0 — clean on all patterns. Browser accessibility tree inspection surfaced 5 distinct a11y issues not found by compilation or contract checks:
+1. H1→H3→H2 heading skip in `CartLineItem.tsx:26` (WCAG 1.3.1)
+2. `role="status"` inside `<button>` double announcement in `AddToCartButton.tsx:30`
+3. No `aria-invalid` on erroring inputs in `PaymentForm.tsx`
+4. Up to 8 simultaneous `role="alert"` on submit (vs single summary region)
+5. No item-specific `aria-label` on CartLineItem remove button
+
+Assessment A P0 (checkout no processing state) was reclassified P1 for demo context (synchronous order creation; no actual delay). All P1s fixed in one bounded recovery. QA gate PASS: Nielsen 29/40 = 7.25/10, P0=0.
+
+**Confirms Entry 001 proposed change #4 is working.** The critique is now a scored artifact with a binary P0 gate, not a suggestion. The 5 a11y findings above would not have been caught by any other gate (not by build, not by contracts, not by cohort). The dual-agent pattern specifically produced Assessment B's browser findings, which Assessment A alone would not have.
+
+**New evidence vs Entry 004 Finding A:** full dual-agent (both sub-agents completing) produces richer browser evidence than inline-degraded mode. Assessment B's heading-skip finding required the accessibility tree inspection, not just the CLI scan. The browser sub-agent is not redundant to the detector.
+
+#### Finding B — Cohort blind spot (Entry 001 §5) confirmed for variant-clarity adaptation
+
+Applied variant-clarity: price deltas and finish descriptions in VariantSelector pills. Retest cohort (seed=42): identical results (CR=13.5%, AOV=$12.85, refund=7.4%). Delta=0.0% on all KPIs. The iteration verdict is GO (no regression + sound UI fix), but the KPI signal is structurally uninformative.
+
+This is the third consecutive cycle (Entry 003 Finding A, Entry 004 Finding B, this entry) where the cohort cannot detect a UI adaptation. The pattern is now robust enough to treat as a design constraint, not an edge case. ATM-420's "evidence-ranked improvements" should treat cohort elasticity (#6 in Entry 001 ranked list) as confirmed-by-three-cycles, not speculative.
+
+#### Finding C — repo-level .gitignore missing from weave-v5-apps until ATM-418 commit
+
+`weave-v5-apps` had no `.gitignore`. When staging `apps/sticker-storefront/`, `node_modules/` (10,657 files) and `.next/` (build artifacts) were included by git. Required manual unstage and creation of `.gitignore` before committing. This did not corrupt the commit but added a manual step not in the lifecycle spec.
+
+**Proposed change (low cost):** Add a `weave-v5-apps/.gitignore` creation step to ATM-416's foundation checklist. A blank gitignore with `node_modules/`, `.next/`, `*.tsbuildinfo` would prevent this across all three remaining apps. Currently ATM-416 is sealed so this goes in the ATM-423 closeout or a future sprint's foundation task.
+
+#### Finding D — `text-ink-faint` contrast failure not caught until impeccable QA
+
+`--color-ink-faint: 156 139 190` on `--color-cream: 255 246 234` ≈ 2.9:1 (below 4.5:1 WCAG AA for normal text). This token is used in 8+ locations (variant sub-labels on pack cards, "each" unit price in cart, metadata strings). The engineering stage passed; the QA critique caught it. Deferred to next sprint (one token change, zero layout impact).
+
+**Confirms Entry 001 proposed change #3 would catch this**: a `surface_quality` hard gate with measured contrast would have blocked engineering from advancing. Currently, contrast is measured only by impeccable's subjective rubric estimate rather than programmatic check. The WCAG AA floor (4.5:1 for normal text) is deterministic and scriptable — this is the strongest remaining case for change #3.
+
+### Scores by stage
+
+| Stage | Score | Gate status |
+|---|---|---|
+| intent | 100% | verified |
+| research | 100% | verified |
+| selection | 100% | verified |
+| plan | 100% | verified |
+| engineering | 100% (10/10 ACs) | build ✓ · contracts ✓ · golden-path ✓ · 1 bounded intervention (launch.json --prefix fix) |
+| qa | 7.25/10 Nielsen | P0=0 ✓ · 5 a11y findings fixed · text-ink-faint deferred |
+| kpi-setup | 100% | freeze ✓ · cohort seed=42 ✓ |
+| iteration | GO (0.0% KPI delta) | variant-clarity applied · no regression |
+| analysis | 100% | verified |
+
+### What held up well
+
+- `validate-contracts.mjs` exit 0 after full build and iteration — frozen contracts intact throughout
+- Dual-agent impeccable: detector exit 0, browser tree surfaced 5 real a11y issues
+- Vinyl Pop system: deterministic scan returned CLEAN (no slop patterns); this is the first V5 app where the AI slop test passes with evidence from both detector and browser
+- Deterministic cohort: seed=42 runs identical before/after adaptation
+- All non-claims present on all synthetic transaction surfaces
+
+### Open items from this cycle
+
+1. **text-ink-faint contrast** (`--color-ink-faint: 156 139 190`) — one token change to ~`120 100 160`; deferred to ATM-419 or closeout
+2. **repo-level .gitignore** — created in this commit; ATM-419 benefits automatically; ATM-423 to confirm nft-storefront and poster-storefront don't stage artifacts
+3. **Cohort elasticity** — three-cycle confirmation; priority ATM-420 candidate
+4. **surface_quality contrast gate (#3)** — `text-ink-faint` failure is the fourth deterministic contrast defect across the sprint; no gate catches it without impeccable
