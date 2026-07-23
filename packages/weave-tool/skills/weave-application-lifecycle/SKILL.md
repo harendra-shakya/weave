@@ -1,233 +1,339 @@
 ---
 name: weave-application-lifecycle
-description: Drive any application from first idea through live iteration using the WEAVE 11-stage lifecycle — autonomously advancing stage by stage with explicit gates, evidence, and owner checkpoints.
+description: Drive a small local commerce app from first idea to a sealed, auditable proof chain — stage by stage, with hard gates, deterministic synthetic measurement, and explicit stops when engineering or the owner is required.
 ---
 
 # WEAVE Application Lifecycle
 
-## Use When
+## Use when
 
-Use this skill when:
+- starting a new local storefront-family app;
+- **resuming** one that stopped mid-lifecycle (this is the common case — the workflow is
+  resumable from `lifecycle/lifecycle-state.json` and needs no memory of the previous session);
+- checking whether an app may advance to the next stage;
+- sealing a finished app into an auditable artifact.
 
-- starting a new application of any kind (SaaS, API, CLI, mobile, marketplace,
-  internal tool, data product, or anything else);
-- resuming an application that has stalled at a lifecycle gate;
-- checking whether an application is ready to advance to the next stage;
-- running the lifecycle loop autonomously so stages advance without manual
-  prompting between each one.
+**Read [`ENVELOPE.md`](ENVELOPE.md) before relying on any stage's verdict.** It records where this
+skill is *proven* (local Next.js storefronts, three sealed examples) versus where it is merely
+*designed to work*, and the four gaps you will meet inside the proven boundary.
 
-This skill works for any application type. It does not assume a technology stack,
-commerce model, or deployment target.
+## The record is the deliverable
 
-That is the design. Where it has actually been *proven* is narrower, and
-[`ENVELOPE.md`](ENVELOPE.md) records that boundary honestly — including the
-limitations you will meet inside it. Read it before relying on a stage's verdict.
+The apps are not the point. **The proof chain is.** A stranger should be able to open
+`apps/<app>/proof/` and check every claim without talking to anyone who built it.
 
-## Inputs
-
-- **app id** — short slug identifying the application (e.g. `my-tool`, `acme-api`)
-- **application description** — what the app does and who it is for
-- **current stage** — inferred from `lifecycle/lifecycle-state.json` if the app
-  already exists; otherwise assume `intent`
-- **owner constraints** — what is explicitly off-limits or requires approval
-- **prior evidence** — any completed stage proof already on disk
-
-## Outputs
-
-- lifecycle-state.json updated with the current stage verdict
-- stage proof written to `proof/` (eval result, procedure readback, artifacts)
-- next stage prompt or explicit blocker with reason
-- owner approval request if a gated stage is reached
-
-## The Two Modes
-
-`"mode"` in `lifecycle-state.json` selects how the lifecycle treats the owner. It
-defaults to `loop` when the field is absent, so a state file written before modes
-existed keeps its current behavior.
-
-| Mode | Behavior | For |
-|------|----------|-----|
-| `loop` | Stages advance without prompting. The stage prompt names the platform skills for that stage and gets out of the way. | Owners who already have the answers — engineers, repeat cycles, iteration runs. |
-| `guided` | A **pre-intent** phase runs first (`weave-guided-intake`), extracting brand vision, one specific target customer, success criteria, and visual direction from a shallow prompt. Every stage prompt then grills for depth before work begins. | Owners who want a production-grade app from "I want to build a store" and do not yet know terms like design tokens or target persona. |
-
-Pre-intent is not a stage — it has no entry in the stage table below and no eval
-contract. It is a gate ahead of `intent`, and writing `lifecycle/intake.json` is
-what closes it. Once intake exists (or `intent` is already verified), guided mode
-runs the same 11 stages as loop mode.
-
-Each stage prompt names that stage's platform skills, drawn from
-`packages/weave-tool/skill-registry.json`. That registry is the seam between
-WEAVE's process stages and the craft skills (brand, design, copy, growth) the
-lifecycle does not implement itself.
-
-## The 11 Stages
+That only holds if the record cannot lie. So one file governs everything:
 
 ```
-[pre-intent]† → intent → research → selection → plan → engineering → qa
-       → deployment* → kpi-setup → marketing* → iteration → analysis → (loop)
+<app-root>/lifecycle/lifecycle-state.json
 ```
 
-`†` = guided mode only; not a stage.
+It is validated by [`schema/lifecycle-state.schema.json`](schema/lifecycle-state.schema.json) and
+enforced by [`tools/validate-lifecycle.mjs`](tools/validate-lifecycle.mjs), which **fails closed**:
+a stage marked `verified` whose proof is missing, or a record whose synthetic-only nonclaim has
+been softened, is an error and exit 1 — never a warning to read past.
 
-`*` = owner-gated. Requires explicit owner approval and external access proof
-before the stage can proceed. The lifecycle loop skips these and continues
-to the next non-gated stage, flagging them for the owner.
+Start from [`templates/lifecycle-state.template.json`](templates/lifecycle-state.template.json).
 
-| Stage | What it proves | Unlocked by | Owner gate |
-|-------|---------------|-------------|------------|
-| intent | The problem and target user are worth investigating | owner | — |
-| research | Product-market facts, risks, and disconfirming evidence are visible | intent | — |
-| selection | The right solution is chosen from real alternatives | research | — |
-| plan | A bounded implementation plan exists with acceptance checks | selection | — |
-| engineering | The app runs, tests pass, and behaviors are verified | plan | — |
-| qa | All specified behaviors are covered and non-claims are recorded | engineering | — |
-| deployment | The app is live at a real URL | qa | **YES** |
-| kpi-setup | A baseline metric run exists with a repeatable measurement method | qa | — |
-| marketing | A launch campaign exists and is ready to send | kpi-setup | **YES** |
-| iteration | At least one improvement cycle (adapt → measure → decide) is complete | kpi-setup | — |
-| analysis | The app's trajectory is documented and the next investment is decided | iteration | — |
+## Stages
+
+```
+intent → research → selection → plan → engineering → qa
+       → [deployment]* → kpi-setup → [marketing]* → iteration → analysis → seal
+```
+
+`*` owner-gated. The loop records the gate and continues; it does not proceed through it.
+
+**9 of 11 stages are proven. `deployment` and `marketing` have never completed in any run.**
+Do not describe this as a proven 11-stage lifecycle.
+
+---
+
+## Stage reference
+
+Each stage: what goes in, what comes out, what blocks advancement, and the failure mode that has
+actually occurred — with its citation. `LOG` = `weave/docs/weave-application-lifecycle-improvement-log.md`.
+
+### 1. intent
+
+- **In:** the owner's description of the app and who it is for; explicit constraints.
+- **Out:** `proof/intent-eval-result.json` — goal, target user, success criteria, non-goals.
+- **Hard gate:** the primary user journey is named as a concrete sequence, not an aspiration.
+- **Failure mode:** an intent that promises a behaviour the app never ships. `LOG` Entry 001
+  records an app whose `intent.md` promised "cancellation and refund" and which shipped no
+  reachable refund UI, through a verified `qa`. **Write the journey as steps you can later walk.**
+- **Escalation:** intent that requires real payments, real user data, or a live deployment →
+  `OWNER_GATE` before any work starts.
+
+### 2. research
+
+- **In:** verified intent.
+- **Out:** `proof/research-eval-result.json` — sourced facts, assumptions and opinions kept apart.
+- **Hard gate:** disconfirming evidence is present. Research with no downside is not research.
+- **Failure mode:** self-attested. There is no gate that executes here; a confident wrong answer
+  scores as well as a right one (`ENVELOPE.md` gap 1).
+
+### 3. selection
+
+- **In:** research.
+- **Out:** `proof/selection-eval-result.json` — real alternatives, the choice, the rationale.
+- **Hard gate:** at least one rejected alternative with the reason it was rejected.
+
+### 4. plan
+
+- **In:** selection.
+- **Out:** `proof/plan-eval-result.json` — bounded task list, acceptance criteria, `proof_date`.
+- **Hard gates:**
+  - every acceptance criterion is checkable by someone who did not write it;
+  - **the plan predates the engineering it describes.** A plan written afterwards is
+    documentation, not a gate. `LOG` Entry 001 records a retrospective plan scoring 93.75%.
+  - if the app has forbidden surfaces, declare `prohibition_contracts` here (see below).
+- **Failure mode:** framework-version assumptions. `LOG` Entry 004 Finding C — a plan specified
+  Next.js 14 against a UI source using the Next.js 15 async-params API. **Check the actual API
+  pattern in the source, do not assume a major version.**
+
+### 5. engineering
+
+- **In:** plan.
+- **Out:** working app; `proof/engineering-eval-result.json` with per-AC status and an
+  intervention count; `INTERVENTION_LEDGER.md` updated.
+- **Hard gates:** build exits 0 · contracts validate · golden path verified on a running dev
+  server · every hand-edit recorded in the ledger.
+- **Failure modes:**
+  - **A build proves compilation, not function.** Next.js compiles an invisible button and an
+    unreachable route without complaint (`LOG` Entry 001 §2).
+  - **Gate portability.** On Windows, gates written in bash or `python3` do not run. `LOG`
+    Entries 001/003/004 and ATM-417 — four recurrences. If a gate cannot execute, record the
+    override **in the eval result, with the exact command and exit code**, and disclose it. Do
+    not mark it passed.
+- **Escalation:** an unsupported adapter, schema, or stack → `ENGINEERING_REQUIRED`.
+
+### 6. qa — **the gate that carries the design bar**
+
+- **In:** a running app.
+- **Out:** `proof/qa-eval-result.json` with the critique scores, the finding list with fix status,
+  and the non-claims.
+- **Hard gate — not a suggestion:**
+  > **`impeccable` critique ≥ 7/10 and zero P0 findings.**
+  > Below either threshold the app returns to engineering. It does not advance.
+- **Run it dual-agent** where possible: Assessment A (design/UX, Nielsen heuristics) and
+  Assessment B (CLI detector + browser accessibility tree) in parallel. `LOG` Entry 005 Finding A —
+  Assessment B's accessibility-tree pass surfaced five real issues that no other gate caught, and
+  which Assessment A alone did not find. If a sub-agent is unavailable, run inline and **emit the
+  degraded banner** (`LOG` Entry 004 Finding A).
+- **Failure mode — the one that keeps happening:** **contrast.** Five deterministic contrast
+  defects across the sprint, every one caught here and nowhere else (`LOG` Entries 001, 004 B,
+  005 D, 006 C). Measure it, do not eyeball it — and if you script it, convert oklch→RGB through
+  a canvas: `getComputedStyle` returns oklch values as-is (`LOG` Entry 006 Finding C).
+
+### 7. deployment — **owner-gated**
+
+Stop. Record `owner_gated_skipped` with the reason, or `owner_gate_blocked` if the owner is
+actively being asked. Never proceed on assumed access. Has never completed in any run.
+
+### 8. kpi-setup — **everything downstream depends on this**
+
+- **In:** a qa-verified app.
+- **Out:** a frozen baseline commit + a baseline cohort run.
+- **Hard gates, in this order — the order is the gate:**
+  1. **Freeze first.** Record the commit in `contracts/freeze-digests.json` *before* running the
+     cohort. That file's own governance says a baseline run under a null `frozen_at_commit` **is
+     invalid** — and `nft-storefront` shipped exactly that (ATM-420 defect D1). The validator now
+     catches it.
+  2. **Then run the cohort**, and link the run back: set `baseline_run_ref`. All three sealed
+     apps left it null (D2).
+  3. **Run it twice.** Same seed, same count. Two runs that reproduce are the determinism proof.
+- **Escalation:** changing a seed, a KPI formula, or a guardrail after a baseline exists →
+  `OWNER_GATE`. Always. Unfreezing your own baseline to improve a number destroys the evidence
+  the lifecycle exists to produce.
+
+### 9. marketing — **owner-gated**
+
+Stop, as `deployment`. Has never completed in any run.
+
+### 10. iteration
+
+- **In:** a frozen baseline.
+- **Out:** one bounded adaptation, an identical-seed retest, and a verdict.
+- **Hard gates:** exactly one bounded change · the retest uses the **same seed** · no guardrail
+  breach · the verdict follows `contracts/kpi/formulas.json` `verdict_rules`.
+- **The verdict rules are not advisory.** GO requires `retest conversion_rate > baseline`. A
+  delta of zero is ITERATE, not GO. `sticker-storefront` recorded GO on a delta of exactly 0.0
+  (D7); the validator now rejects that.
+- **Failure mode — read this before designing an experiment:** see *Deterministic measurement*
+  below. If your adaptation is a UI change, **the cohort will return zero and that result is
+  uninformative, not negative.**
+
+### 11. analysis
+
+- **In:** a completed iteration.
+- **Out:** `proof/analysis-result.json` — wins, failures and unknowns kept separate; the next
+  decision with its evidence.
+- **Hard gate:** every unknown is labelled as unknown. An analysis that estimates a number
+  nothing measured is worse than one that says `[UNKNOWN]`.
+
+### 12. seal
+
+- **Out:** `proof/seal-manifest.json` — per-file sha256 across the app.
+- **Hard gate:** `node tools/validate-lifecycle.mjs --root <repo> --app <app-id>` exits 0.
+- After sealing, `lifecycle-state.json` is **inside** the manifest. Editing it invalidates the
+  seal. Fix the record before you seal, not after.
+
+---
+
+## Deterministic measurement — cohort, seed, digest
+
+Every stage from `kpi-setup` onward rests on one property: **the same seed produces the same event
+stream, every time.** If a retest cannot reproduce the baseline's own numbers on the same seed,
+nothing it says about an adaptation means anything.
+
+**The cohort runner.** `weave-v5-apps/tools/cohort-runner.mjs`:
+
+```bash
+node tools/cohort-runner.mjs --app <app-id> --seed 42 --count 200
+```
+
+It walks a `mulberry32` PRNG against the app spec's funnel probability table and writes
+`proof/cohort-<timestamp>/cohort-result.json`.
+
+**The seed.** `contracts/cohort/seeds.json` freezes the primary seed at **42**, 200 users. The
+runner warns if you pass anything else. **Baseline and retest must use the same seed** — that is
+what makes the delta attributable to the adaptation rather than to sample variance. Changing a
+frozen seed is `OWNER_GATE`.
+
+**The digest — and its current gap.** A digest means a checksum over the generated event stream:
+one for the frozen baseline, one after the retest. Identical seed with identical digest proves the
+retest reran the same stream; a differing digest on an identical seed means non-determinism leaked
+in and the comparison is void until it is fixed.
+
+> **`cohort-runner.mjs` does not currently emit one.** `cohort-result.json` has no digest field
+> (ATM-420 defect D8). Until it does, determinism is proved by **byte-comparing two run outputs
+> with `generated_at` removed** — which is how it was verified for the sealed apps. Keep both runs
+> on disk; one run proves nothing (D4). Emitting a digest from the runner is the smallest
+> high-value fix left in this system.
+
+**What the cohort can and cannot do — a hard constraint, not a caveat:**
+
+> The synthetic cohort cannot be used to rank or validate UI adaptations. Its role is limited to
+> (a) confirming no guardrail breach after an adaptation, and (b) providing a frozen KPI baseline
+> for cross-app comparison. Ranking UI adaptations requires real user data.
+
+Four consecutive cycles produced a delta of exactly zero from a UI change (`LOG` Entries 003, 004,
+005, 006). The engine has no representation of copy, layout, price or contrast. **Do not design an
+iteration experiment that asks the cohort a question it cannot answer** — and do not "fix" this by
+adding elasticity parameters that make the model appear responsive (`ENVELOPE.md` gap 3).
+
+---
+
+## Prohibition contracts
+
+Some apps must prove a surface is **absent**. `nft-storefront` had to prove no wallet, chain, mint,
+token or RPC surface existed anywhere — in source, dependencies, or config.
+
+That is architecturally different from a functional contract. A functional contract asks *does X
+exist?*; a prohibition contract asks *does X exist anywhere, ever?* — and it can only be satisfied
+by a scan.
+
+**Pattern** (`weave-v5-apps/contracts/negative/nft-chainless.json`):
+
+- enumerate the forbidden terms;
+- enumerate `known_false_positives` — your own brand's negation copy will trip the scan;
+- run the scan at **every** engineering gate, not once;
+- record a negative proof bundle: code clean · dependencies clean · config clean · runtime clean.
+
+**When the scanner flags your own copy** ("skip the wallet", "no gas", "not on any chain"), resolve
+it through `known_false_positives`. Do **not** reword the brand — that silently erodes the proof.
+Do **not** edit the contract — it is frozen, and that is `OWNER_GATE`. (`LOG` Entry 006 Finding B.)
+
+This generalizes to medical advice, financial advice, PII, credentials, and real payments.
+
+---
+
+## Stop conditions
+
+A stop is **recorded, not worked around.** An unrecorded stop is a false claim of completion.
+
+| Stop | State to record | Means | Who unblocks it |
+|---|---|---|---|
+| `ENGINEERING_REQUIRED` | `engineering_required` | Work outside the lifecycle's competence — a code change, adapter, schema migration, or security fix that cannot be produced from evidence alone. | An engineer |
+| `OWNER_GATE` | `owner_gate_blocked` | A decision or access only the owner holds. | The owner |
+
+Both states are in the schema and **both are enforced**: a stop that names no `reason` or
+`blocked_by` is a validation error. `tests/negative.test.mjs` covers both. This closes the oldest
+open question in the improvement log — *"do `ENGINEERING_REQUIRED` and `OWNER_GATE` actually
+fire?"* (Entry 001 §Open questions). They now fire against a fixture, and the fixture is in the
+test suite.
+
+**Record `ENGINEERING_REQUIRED` when:**
+
+- an adapter, schema, stack, or invariant the lifecycle does not support is required;
+- a hard gate fails as specified and the failure is a real defect, not a portability problem;
+- a stage's evidence gap is buildable but not by this lifecycle.
+
+**Record `OWNER_GATE` when:**
+
+- `deployment` or `marketing` is reached — always;
+- production access, credentials, elevated privilege, or spend/payment is required;
+- a public provider marketplace, wallet/chain surface, or publication is involved;
+- **a frozen contract, seed, or KPI formula would have to change** — freezing is what makes a
+  retest meaningful;
+- the material goal of the app changes;
+- a downstream stage contradicts a sealed one and no overwrite record exists.
+
+Do not downgrade a stop to a warning to keep the loop moving.
+
+---
+
+## Validation
+
+```bash
+# from this repo, against an app repo elsewhere — the cross-repo case is the point
+node tools/validate-lifecycle.mjs --root ../../../../weave-v5-apps --app nft-storefront
+
+# a bare state file, for fixtures
+node tools/validate-lifecycle.mjs --state path/to/lifecycle-state.json
+
+# the fail-closed proof (glob form — `node --test <dir>` is unreliable on Windows)
+node --test tests/negative.test.mjs
+```
+
+The validator is pure Node — no shell, no Python, no platform assumption — and resolves every path
+from `--root`. That is deliberate: the gate-portability wall (`ENVELOPE.md` gap 1) is exactly the
+failure of tools that resolve paths from their own location.
+
+**What it rejects:** a `verified` stage with no proof, or with proof absent from disk · a missing or
+softened synthetic-only nonclaim · an unknown stage state · a missing stage · a stop with no reason ·
+a missing `INTERVENTION_LEDGER.md` while stages are verified · a baseline run under a null
+`frozen_at_commit` · a GO verdict on a non-positive delta.
+
+**Expected result against the three sealed examples: not clean.** They report 2, 3 and 4 errors
+respectively. That is the intended outcome — the defects are real (ATM-420 §2), the apps are sealed
+so they were reported rather than repaired, and **a validator that passed all three would not be
+failing closed.**
+
+---
+
+## Resuming
+
+The workflow needs no memory of a previous session.
+
+1. Read `<app-root>/lifecycle/lifecycle-state.json`. If it is absent, copy the template.
+2. Run the validator. **If it reports errors, fix the record before doing any stage work** — every
+   later stage rests on it.
+3. Find the first stage whose state is not `verified` and not one of the gated states.
+4. If that stage is `engineering_required` or `owner_gate_blocked`, stop and report what is
+   blocked and who unblocks it. Do not continue past a stop.
+5. If it is `deployment` or `marketing`, record the gate and continue to the next stage.
+6. Otherwise do that stage's work, write its proof, set `state: verified` with the proof ref.
+7. Return to step 2.
 
 ## Rules
 
-- Infer the current stage from `lifecycle/lifecycle-state.json`. Do not ask the
-  owner to classify the stage.
-- Load the stage-entry contract before acting:
-  `packages/weave-tool/evals/lifecycle/<stage>.yaml` and the app's
-  `lifecycle/<stage>/procedure.md` if it exists.
-- Do not advance a stage without recorded proof in `proof/`.
-- Owner-gated stages (`deployment`, `marketing`) must stop and emit an explicit
-  owner action request. Do not proceed past them automatically.
-- Returning to an earlier stage requires an overwrite record naming the reason
-  and listing affected downstream stages.
-- Non-claims must be recorded whenever a stage proves less than it appears to.
-- A stage is not verified until its eval score meets the minimum threshold
-  defined in the eval YAML (`advance_min_score_percent`).
-- Each stage proof artifact must record a `proof_date` (ISO-8601). A stage
-  whose `proof_date` postdates the following stage's first commit is
-  `engineering_required`, not `verified` — a retrospectively written proof is
-  documentation, and documentation is not a gate.
-
-## Procedure
-
-1. Read `lifecycle/lifecycle-state.json` for the app. If it does not exist,
-   create it from the template at
-   `packages/weave-tool/skills/weave-application-lifecycle/templates/lifecycle-state.template.json`.
-2. Identify the first stage whose `state` is not `verified` or
-   `owner_gated_not_pursued`.
-3. If that stage is owner-gated, stop. Emit an owner action request with what
-   is needed (provider access, approval record, etc.) and which stage is blocked.
-4. Load the stage-entry contract for that stage.
-5. Perform the stage work according to the eval rubric and procedure. `engineering`
-   and `qa` have hard command gates that actually execute — run them with:
-   ```sh
-   python3 scripts/weave_eval.py <stage> --run-gates --app-path <path-to-your-app>
-   ```
-   Omit `--app-path` only when the app lives inside the weave-tool repo itself.
-   Pointing it at your app's root is what makes the test/build/scan commands
-   run against your app instead of the weave-tool repo.
-6. Write proof to `proof/<stage>-eval-result.json` (or the path the eval specifies).
-7. Update `lifecycle-state.json`: set `state` to `verified`, add `eval_result_ref`
-   and `eval_score_percent`.
-8. Return to step 2 — repeat until all stages are complete or a gate is reached.
-
-## Autonomous Loop
-
-The lifecycle runner automates steps 1–3:
-
-```sh
-node packages/weave-tool/skills/weave-application-lifecycle/runner/lifecycle-runner.mjs \
-  --app <app-id> \
-  --root <path-to-repo-containing-the-app>
-```
-
-The runner reads the lifecycle state, finds the next actionable stage, and
-prints the stage prompt. Claude reads the prompt, does the work, and the caller
-runs the runner again to get the next prompt. This loop requires no manual
-inter-stage prompting.
-
-When all non-owner-gated stages are complete, the runner prints:
-`ALL STAGES COMPLETE — ready to seal and close.`
-
-## Proof Requirements by Stage
-
-| Stage | Minimum proof |
-|-------|--------------|
-| intent | `intent.json` with goal, target user, success criteria, non-goals |
-| research | Research doc with sourced facts, assumptions, opinions separated |
-| selection | Selection record with alternatives considered, decision rationale |
-| plan | Implementation plan with acceptance checks and approval gates |
-| engineering | Tests pass, behaviors browser- or runtime-verified |
-| qa | QA eval result, behaviors coverage list, non-claims recorded |
-| deployment | Live URL, deployment log, DNS/hosting provider confirmed |
-| kpi-setup | Baseline metric run, measurement method documented, digest recorded |
-| marketing | Campaign assets, send plan, owner approval record |
-| iteration | Adaptation applied, measurement rerun, GO/ITERATE/PIVOT/STOP decision |
-| analysis | Analysis doc, trajectory summary, next investment decision |
-
-## Deterministic Measurement (kpi-setup / iteration)
-
-`kpi-setup` and every later stage depend on one property: **the same seed
-produces the same event stream, every time.** That is what makes a baseline
-freezable and a retest meaningful — if the retest cannot reproduce the
-baseline's own numbers on the same seed, nothing it reports about an
-adaptation can be trusted either.
-
-- `tools/generate-events.mjs --seed <int> --count <int> [--schema <path>] [--output <path>]`
-  generates the synthetic feedback/funnel/order/refund event stream. The
-  default funnel is `view → engage → convert → fulfill → refund`; pass
-  `--schema` (see `examples/event-schema.example.json`) to model a different
-  funnel. Same seed, same `--count`, same schema → byte-identical output,
-  every run.
-- **Digest** means a checksum of that output — hash the generated events file
-  (or run `tools/seal.mjs` over the directory containing it) once for the
-  frozen baseline and again after the retest. Identical seed, identical
-  digest is the proof the retest reran the same stream; a differing digest on
-  an identical seed means something non-deterministic leaked in and the
-  comparison is invalid until that is fixed.
-- `tools/kpi-compare.mjs --baseline <path> --current <path>` reports the delta
-  between two KPI snapshots computed from those event streams — this is what
-  the iteration stage's GO/ITERATE/PIVOT/STOP decision is based on.
-
-## Stop Conditions
-
-A stop is recorded, not worked around. Every stop is one of two kinds, and the
-record must name which:
-
-| Stop | Means | Who unblocks it |
-|------|-------|-----------------|
-| `ENGINEERING_REQUIRED` | The lifecycle cannot proceed without work outside its competence — a code change, adapter, schema migration, or security fix the skill cannot produce from evidence alone. | An engineer |
-| `OWNER_GATE` | The lifecycle is blocked on a decision or access only the owner holds — approval, credentials, provider access, or an amendment to something already frozen. | The owner |
-
-Record `ENGINEERING_REQUIRED` by setting that stage's `state` to
-`engineering_required` in `lifecycle-state.json` (not `verified`, and not left
-`in_progress`). The runner recognizes this state, stops there, and tells the
-next operator what is blocked — it does not let the loop continue past it,
-and it does not require overruling a failed gate to record the stop.
-
-Stop and emit the matching record when:
-
-- a stage lacks evidence and the eval minimum score cannot be met
-  (`ENGINEERING_REQUIRED` if the gap is buildable, `OWNER_GATE` if it needs a
-  decision);
-- a gated stage (`deployment`, `marketing`) is reached without an owner approval
-  record — `OWNER_GATE`;
-- the plan requires live credentials, real payments, or real user data the owner
-  has not authorized — `OWNER_GATE`;
-- a downstream stage contradicts a prior sealed stage and no overwrite record
-  exists — `OWNER_GATE`;
-- correcting a defect would require editing a frozen contract, seed, or KPI
-  definition — `OWNER_GATE`. Freezing is what makes retests meaningful; a
-  lifecycle that unfreezes its own baseline to make a number look better has
-  destroyed the evidence it exists to produce.
-
-Do not downgrade a stop to a warning to keep the loop moving. An unrecorded stop
-is a false claim of completion.
-
-## Verification
-
-Closeout is valid when:
-- every non-owner-gated stage shows `state: verified` in lifecycle-state.json;
-- every verified stage has a proof artifact on disk that another agent or reviewer
-  can open and check without needing this conversation;
-- all owner-gated stages are either verified (with approval record) or explicitly
-  marked `owner_gated_not_pursued`.
+- Infer the stage from the record. Do not ask the owner to classify it.
+- Never advance a stage without proof on disk that someone else can open.
+- Never edit a frozen contract, seed, or KPI formula — `OWNER_GATE`, every time.
+- Record every hand-edit in `INTERVENTION_LEDGER.md` as you make it. ATM-422's honesty audit
+  depends on these files, and one app has already sealed without one.
+- Record non-claims whenever a stage proves less than it appears to.
+- **Never convert a synthetic result into a claim about real demand.** The nonclaim is a required
+  literal in the record, not a stylistic preference — the validator checks the exact sentence.

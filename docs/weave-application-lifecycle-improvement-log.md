@@ -492,3 +492,162 @@ Unlike ATM-418 (sub-agents for both Assessment A and B), ATM-419 ran the dual-ag
 2. **Programmatic contrast gate** — fifth defect confirms this; ATM-423 natural insertion point
 3. **Cohort blind spot** — four cycles; ATM-420 cross-app comparison should state this as a hard constraint
 4. **Canvas-based oklch→RGB** — the `getComputedStyle` issue (oklch returned as-is) should be documented in the contrast-check script spec so ATM-423's tooling uses canvas, not computed style
+
+---
+
+## Entry 007 — 2026-07-24 — ATM-420/421: the unenforced-contract failure mode, and the first fail-closed validator
+
+### What was done
+
+Cross-app comparison of the three sealed V5 apps (ATM-420) and a rewritten
+`weave-application-lifecycle` skill package (ATM-421). No app was built or modified. The prior
+generation's artifacts (`docs/atm-415/comparison/`, the pre-wipe skill package) were deleted rather
+than merged — they described a wiped workspace and contradicted the sealed apps on every number.
+
+New in this package: `schema/lifecycle-state.schema.json` (the lifecycle's own contract, which did
+not previously exist), `tools/validate-lifecycle.mjs` (pure Node, resolves from `--root`), and
+`tests/negative.test.mjs` (15 tests, all passing).
+
+### Findings
+
+#### Finding A — The sprint's dominant failure mode is the unenforced contract, and it is measurable
+
+Nine defects were found across the three sealed apps (ATM-420 §2). **Five of them — D1, D2, D5, D7,
+D9 — are the same failure: a rule was written into `contracts/`, frozen, and never read by any code.**
+
+- `contracts/freeze-digests.json` states in its own governance line that a baseline run under a null
+  `frozen_at_commit` is invalid. `nft-storefront` ran two baselines under a null freeze, sealed, and
+  advanced through iteration and analysis to `sealed` with nine stages verified. Nothing stopped it.
+- `contracts/kpi/formulas.json` `verdict_rules` require `retest conversion_rate > baseline` for GO.
+  `sticker-storefront` recorded GO on a delta of exactly 0.0.
+- Nothing in `contracts/` defines a lifecycle-stage state vocabulary at all — `state-transitions.json`
+  covers *order* state only. Three apps in one workspace produced three incompatible state shapes.
+
+The control case is decisive. The two domains that **do** have enforcement produced zero defects
+across all three apps: commerce schemas via `validate-contracts.mjs` (9 checks, 0 warnings, every
+gate) and design quality via the `impeccable` P0 blocker (all three cleared ≥7/10 with zero P0;
+5 P1s and 2 P2s fixed inside QA rather than shipped).
+
+**Enforced rules held. Unenforced rules drifted. The distinction is not effort or seniority — it is
+whether code reads the rule.** This sharpens Entry 001's thesis ("the lifecycle proves work happened,
+not that it is any good"): the lifecycle does not even prove its own recorded rules were followed,
+unless something executes them.
+
+#### Finding B — Nonclaim drift: the disclaimer was prose, so it eroded (new defect, D10)
+
+Found while running the new validator. All three apps carry a synthetic disclaimer in `non_claims`.
+**All three wrote their own wording, and none of the three says "real demand":**
+
+| App | What it actually says |
+|---|---|
+| video-storefront | "synthetic cohort only — not real traffic" |
+| sticker-storefront | "synthetic cohort only — not real sticker buyer behavior" |
+| nft-storefront | "synthetic collectibles only — no financial value, no resale" |
+
+Each is true. None of them forbids the specific claim ATM-420 and ATM-421 both prohibit: converting
+a synthetic KPI into a statement about real demand. "Not real traffic" is a statement about the
+input; "does not prove real demand" is a statement about what may be concluded. Three independent
+authors, given the instruction in prose, each produced a weaker sentence than intended — without
+anyone noticing, and with the strongest wording appearing nowhere.
+
+**Change shipped:** the nonclaim is now a required literal in
+`schema/lifecycle-state.schema.json` (`x-weave.required_non_claim`), matched exactly. A record whose
+`non_claims` does not contain the sentence verbatim does not validate. A test covers the interesting
+attack — a disclaimer that is *softened* rather than removed ("synthetic cohort results are
+indicative of real demand") — which the validator rejects with a diff of found-vs-required.
+
+This is the direct answer to ATM-421's acceptance gate *"synthetic results cannot become real-demand
+claims (enforced, not just documented)"*. Prose could not carry it. Three apps are the evidence.
+
+#### Finding C — `ENGINEERING_REQUIRED` and `OWNER_GATE` now fire, against fixtures
+
+Entry 001's oldest open question: *"Do `ENGINEERING_REQUIRED` and `OWNER_GATE` actually fire? Every
+sealed example reached `verified` or `owner_gated_not_pursued`; no run in evidence has produced an
+`engineering_required` state. Unfired stop conditions are untested code. Action: construct a negative
+fixture that must trigger each."*
+
+Done. Both are schema states (`engineering_required`, `owner_gate_blocked`), both require a `reason`
+or `blocked_by`, and both have a test asserting that a stop with no reason is rejected and a stop
+with one is accepted. `tests/negative.test.mjs` — 15 tests, 15 passing.
+
+**Caveat, recorded honestly:** they fire against fixtures. **No real run has produced either state.**
+Fixture coverage moves them from untested code to tested code; it does not prove an operator will
+correctly recognise the situation that warrants one. That remains ATM-422's question.
+
+#### Finding D — Gate portability: solved for this tool, unsolved for the inherited gates
+
+`tools/validate-lifecycle.mjs` was verified cross-repo — invoked from
+`weave/packages/weave-tool/skills/…` against `weave-v5-apps` — and correctly resolved, read, and
+judged all three apps. It is pure Node with no shell, Python, or platform dependency, and resolves
+every path from `--root`, never from its own location.
+
+That is the first time any gate in this system has been demonstrated working across a repo boundary
+(Entry 001 Change #1, open since 2026-07-21, four recurrences).
+
+**It is not the fix.** The inherited `check_no_secrets.py` / `public_safe_repo_scan.py` / bash gates
+are unchanged and still fail on Windows — `video-storefront/proof/engineering-eval-result.json`
+records two of five engineering gates as `"windows-runner-incompatible"` and
+`qa-eval-result.json` records `exit 9009` for `public_safe_scan_pass`. What this entry establishes is
+the *pattern* that works: no shell, no interpreter, resolve from an argument. Change #1 stays open.
+
+#### Finding E — The validator against the sealed apps: the expected result is failure
+
+Cross-repo run, 2026-07-24:
+
+| App | Errors | Which |
+|---|---|---|
+| video-storefront | 2 | nonclaim drift (D10) · null `baseline_run_ref` (D2) · **+1 warning**: single cohort run (D4) |
+| sticker-storefront | 3 | nonclaim drift · null `baseline_run_ref` · **GO on a zero delta** (D7) |
+| nft-storefront | 4 | nonclaim drift · missing `INTERVENTION_LEDGER.md` (D3) · **null `frozen_at_commit` with two baseline runs** (D1) · null `baseline_run_ref` |
+
+Recorded as the acceptance criterion in `ENVELOPE.md` and `SKILL.md`: **a validator that passes all
+three sealed apps clean is not failing closed.** The defects are real; the apps are sealed and their
+`lifecycle-state.json` sits inside each seal manifest, so they were reported rather than repaired.
+
+Note which app scored best and validated worst. `nft-storefront` has the highest QA score of the
+three (8.5/10, zero P0) and the least valid measurement (baseline under a null freeze). Stage scores
+and record integrity are independent axes, and only one of them was being checked.
+
+#### Finding F — No cost ledger exists, in any app, for any stage
+
+The Collection Protocol (after Entry 002) requires wall time and model/token cost per stage "so
+improvement cost can be argued against ATM-415's 15% skill/primitives allocation". **Nothing recorded
+it for any of the three apps.** Not wall time, not tokens, not tool-use counts.
+
+The consequence is specific: **the claim that WEAVE is cheaper or faster than an engineer is
+currently unmeasurable in either direction.** ATM-420 states this as `[UNKNOWN]` and declines to
+estimate. Six entries of this log have now argued about which improvements are worth their cost
+without any cost data existing.
+
+### Scores by stage
+
+Not applicable — ATM-420 and ATM-421 are analysis and packaging tickets; no app ran a lifecycle.
+
+### What held up well
+
+- The three-app proof structure made the cross-app comparison mechanical rather than interpretive:
+  26 eval-result artifacts in the same shape per app, every number traceable to a file
+- Determinism reproduced by byte-comparison for sticker and nft (identical after stripping
+  `generated_at`) — the property survives even without a digest field
+- `validate-contracts.mjs` exit 0 throughout; no frozen contract was touched by either ticket
+- The `impeccable` gate's record across three apps is the strongest evidence in this log that
+  converting a suggestion into a hard gate changes outcomes
+- Vitrine's chainless prohibition proof remains clean and independently verifiable
+
+### Open items from this cycle
+
+1. **Emit a digest from `cohort-runner.mjs`** (D8) — smallest high-value fix remaining. The
+   identical-retest contract is the foundation of every stage from kpi-setup onward and currently
+   has no machine-checkable artifact; determinism was verified by hand for this entry.
+2. **Programmatic contrast gate** — unchanged from Entry 006, still five observations, still the
+   strongest unbuilt case. `sticker-storefront`'s `text-ink-faint` at ~2.9:1 is still deferred and
+   still open.
+3. **Gate portability for the inherited Python/bash gates** (Entry 001 Change #1) — the pattern that
+   works is now demonstrated; applying it to `check_no_secrets.py` and `public_safe_repo_scan.py` is
+   not done.
+4. **Cost ledger** (Finding F) — six entries of cost-benefit argument with no cost data.
+5. **`ENGINEERING_REQUIRED` / `OWNER_GATE` in a real run** — fixtures pass; no real run has produced
+   either state. ATM-422 is the test.
+6. **Canonize prohibition contracts as a gated artifact** — `SKILL.md` documents the pattern and the
+   plan stage accepts `prohibition_contracts`, but no gate requires one and no schema validates the
+   negative proof bundle. Carried from Entry 006 item 1, partially addressed.

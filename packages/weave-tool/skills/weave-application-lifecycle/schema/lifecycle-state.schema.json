@@ -1,0 +1,120 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://weave.dev/schemas/lifecycle-state/v1",
+  "title": "WEAVE lifecycle state",
+  "description": "The record of which lifecycle stages have passed, what proved each one, and what the app explicitly does not claim. This file is the lifecycle's own contract: before v1 the weave-v5-apps workspace froze order states, KPI formulas, cohort seeds and negative contracts, but nothing governed the stage record itself — and three apps in one workspace produced three incompatible shapes (ATM-420 defect D5). tools/validate-lifecycle.mjs reads the vocabularies below rather than restating them, so this file is the single source of truth.",
+
+  "type": "object",
+  "required": ["schema", "app_id", "current_stage", "stages", "non_claims", "updated_at"],
+  "additionalProperties": true,
+
+  "properties": {
+    "schema": {
+      "type": "string",
+      "description": "Schema identifier. weave-cos-lifecycle/v0.1 is accepted for the ATM-415 sealed apps."
+    },
+    "app_id": { "type": "string", "minLength": 1 },
+    "current_stage": {
+      "type": "string",
+      "description": "The stage the app is at, or a terminal marker.",
+      "$comment": "Terminal markers vary across the sealed apps (complete vs sealed) — both accepted, see x-weave.terminal_stages."
+    },
+    "mode": { "enum": ["loop", "guided"], "default": "loop" },
+    "stages": {
+      "type": "array",
+      "minItems": 11,
+      "items": { "$ref": "#/$defs/stage_entry" }
+    },
+    "non_claims": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "type": "string" },
+      "description": "What this app does NOT prove. Must include the synthetic-only nonclaim verbatim — see x-weave.required_non_claim."
+    },
+    "deployment_gates": { "type": "object" },
+    "updated_at": { "type": "string" }
+  },
+
+  "$defs": {
+    "stage_entry": {
+      "type": "object",
+      "required": ["stage", "state"],
+      "additionalProperties": true,
+      "properties": {
+        "stage": { "$ref": "#/$defs/stage_name" },
+        "state": { "$ref": "#/$defs/stage_state" },
+        "eval_result_ref": { "type": "string" },
+        "proof_ref": { "type": "string" },
+        "cohort_ref": { "type": "string" },
+        "reason": { "type": "string" },
+        "blocked_by": { "enum": ["ENGINEERING_REQUIRED", "OWNER_GATE"] }
+      }
+    },
+
+    "stage_name": {
+      "enum": [
+        "intent", "research", "selection", "plan", "engineering",
+        "qa", "deployment", "kpi-setup", "marketing", "iteration", "analysis"
+      ]
+    },
+
+    "stage_state": {
+      "description": "not_started: not reached. in_progress: work started, not proven. verified: passed its gate AND has a proof ref that exists on disk. owner_gated_skipped / owner_gated_not_pursued: reached, requires owner access, not pursued (synonyms; both are in the sealed apps). engineering_required: stopped, needs work outside the lifecycle's competence. owner_gate_blocked: stopped, needs an owner decision or access.",
+      "enum": [
+        "not_started",
+        "in_progress",
+        "verified",
+        "owner_gated_skipped",
+        "owner_gated_not_pursued",
+        "engineering_required",
+        "owner_gate_blocked"
+      ]
+    }
+  },
+
+  "x-weave": {
+    "$comment": "Machine-readable vocabulary consumed by tools/validate-lifecycle.mjs. Kept here so the schema and the validator cannot drift apart.",
+
+    "stage_order": [
+      "intent", "research", "selection", "plan", "engineering",
+      "qa", "deployment", "kpi-setup", "marketing", "iteration", "analysis"
+    ],
+
+    "terminal_stages": ["complete", "sealed"],
+
+    "owner_gated_stages": ["deployment", "marketing"],
+
+    "gated_states": ["owner_gated_skipped", "owner_gated_not_pursued"],
+
+    "stop_states": {
+      "engineering_required": "ENGINEERING_REQUIRED",
+      "owner_gate_blocked": "OWNER_GATE"
+    },
+
+    "proof_ref_fields": ["eval_result_ref", "proof_ref", "cohort_ref"],
+
+    "required_non_claim": {
+      "text": "Synthetic cohort only — these KPIs do not prove real demand, real conversion, or real financial performance.",
+      "rationale": "ATM-420 and ATM-421 both forbid converting a synthetic cohort result into a real-demand claim. Prose in a procedure cannot enforce that; a required literal in the record can. A state file whose non_claims array does not contain this exact sentence does not validate, so an operator cannot publish KPIs from this lifecycle without the disclaimer travelling with them.",
+      "match": "exact"
+    },
+
+    "intervention_ledger": {
+      "filename": "INTERVENTION_LEDGER.md",
+      "required_when": "any stage is verified",
+      "rationale": "ATM-420 defect D3 — nft-storefront sealed with no ledger, so its intervention count is unrecorded rather than verified-zero. ATM-422's honesty audit depends on these files existing."
+    },
+
+    "freeze_contract": {
+      "path": "contracts/freeze-digests.json",
+      "rule": "An app with a sealed baseline cohort run must have a non-null frozen_at_commit.",
+      "rationale": "ATM-420 defect D1 — that file's own governance note says a baseline run under a null frozen_at_commit is invalid, and nothing enforced it. The freeze is the boundary between building the app and running the experiment."
+    },
+
+    "verdict_contract": {
+      "path": "contracts/kpi/formulas.json",
+      "rule": "A zero or negative conversion delta cannot be recorded as GO. GO requires retest conversion_rate > baseline.",
+      "rationale": "ATM-420 defect D7 — sticker-storefront recorded GO on a delta of exactly 0.0, which the frozen verdict_rules do not permit."
+    }
+  }
+}

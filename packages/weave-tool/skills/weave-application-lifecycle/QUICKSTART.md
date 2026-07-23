@@ -1,163 +1,145 @@
-# Quickstart — No engineering background required
+# Quickstart — starting a new app
 
-This guide gets you from nothing to a running lifecycle in under 15 minutes.
-You do not need to know how to code. You need a terminal and Node.js installed.
+For an operator who is not a software engineer. Read [`ENVELOPE.md`](ENVELOPE.md) first: it says
+where this is proven and where it is not, and it is short.
 
----
-
-## What you are doing
-
-You are going to create a small application — any kind: a web store, a tool, a
-service — and take it through a structured series of stages so that at the end
-you have real evidence that it works, and a clear decision about what to do next.
-
-The lifecycle has 11 stages. Two of them require your approval before anything
-happens (deployment and marketing). The rest run automatically, one after the
-other, guided by a runner that tells you exactly what to do at each step.
+**Before you start, know what this is honest about.** This process produces a *sealed, auditable
+record* of a small local storefront. It does not produce a deployed business, and it does not tell
+you whether anyone wants what you built. The measurements are synthetic. See §"What you will not
+get" at the end — it is the most useful section here.
 
 ---
 
-## Before you start
+## What you need
 
-You need:
-- [Node.js](https://nodejs.org) 18 or newer installed (`node --version` to check)
-- The `weave` repository cloned on your computer
-- A new folder for your app — we will call it `my-app` in this guide
-
-You do **not** need:
-- A GitHub account
-- A hosting account
-- Any payment credentials
-- Any prior software development experience
+- Node 20+ and a terminal.
+- A repo with the `contracts/`, `tools/` and `apps/` layout — `weave-v5-apps` is the reference.
+- A description of the app: what it sells, who buys it, what "working" means.
+- **An engineer available for the steps marked ⚠ below.** There are four. Nobody has yet run this
+  end to end without one; ATM-422 is the ticket that tests whether that is possible.
 
 ---
 
-## Step 1 — Create your app folder and lifecycle state
+## The path
 
-Open a terminal. Navigate to your new app folder.
+### 1. Create the record
 
-Copy the lifecycle template to start tracking your progress:
-
-```sh
-cp <weave-repo>/packages/weave-tool/skills/weave-application-lifecycle/templates/lifecycle-state.template.json \
-   lifecycle/lifecycle-state.json
+```bash
+mkdir -p apps/<app-id>/lifecycle
+cp <skill>/templates/lifecycle-state.template.json apps/<app-id>/lifecycle/lifecycle-state.json
 ```
 
-Open `lifecycle/lifecycle-state.json` in any text editor. Change the two
-placeholders:
+Open it, set `app_id`, delete `_template_note`, and replace the placeholder line in `non_claims`
+with everything your app does not prove. **Leave the first entry exactly as written** — the
+synthetic-only sentence is checked character for character, and the record will not validate
+without it.
 
-- `"app_id": "<app-id>"` → a short name with no spaces, like `my-store`
-- `"updated_at": "<ISO-8601>"` → today's date, like `2026-07-17T00:00:00Z`
+Then, before anything else:
 
-Remove the `"_template_note"` line. Save the file.
-
-Confirm the file is valid:
-
-```sh
-node <weave-repo>/packages/weave-tool/skills/weave-application-lifecycle/tools/validate.mjs \
-  lifecycle/lifecycle-state.json
+```bash
+node <skill>/tools/validate-lifecycle.mjs --root . --app <app-id>
 ```
 
-You should see `OK — lifecycle/lifecycle-state.json`. If not, fix the errors it
-lists before continuing.
+Get into the habit now. Run it after every stage. It is the only thing standing between you and a
+record that quietly says something untrue.
+
+### 2. Work the stages in order
+
+`SKILL.md` has the full reference — inputs, outputs, gates, and the failure mode that has actually
+occurred at each stage. The short version:
+
+| Stage | You produce | It advances when |
+|---|---|---|
+| intent | goal, target user, success criteria, non-goals | the user journey is written as steps you could walk |
+| research | facts, assumptions and opinions kept apart | disconfirming evidence is present |
+| selection | the choice and what you rejected | at least one rejected alternative has a reason |
+| plan | tasks + acceptance criteria | criteria are checkable by someone else, and the plan predates the build |
+| engineering ⚠ | the working app | build exits 0, contracts validate, golden path verified live |
+| qa | the design critique | **≥ 7/10 and zero P0** — below either, it goes back |
+| deployment | *(stop)* | owner-gated — record it and move on |
+| kpi-setup ⚠ | frozen baseline + cohort run | freeze **first**, then run, then link the run, then run again |
+| marketing | *(stop)* | owner-gated — record it and move on |
+| iteration | one bounded change + retest | same seed, no guardrail breach, verdict follows the frozen rule |
+| analysis | what worked, what didn't, what you don't know | unknowns are labelled unknown |
+| seal ⚠ | the manifest | the validator exits 0 |
+
+After each stage: write the proof file, set the stage to `verified` with its proof ref, run the
+validator.
+
+### 3. Measure
+
+```bash
+node tools/cohort-runner.mjs --app <app-id> --seed 42 --count 200
+```
+
+Three things about this, all of which have gone wrong before:
+
+- **Freeze before you run.** Record the commit in `contracts/freeze-digests.json` first. One sealed
+  app ran its baseline under a null freeze, which that file's own rules call invalid.
+- **Run it twice.** Two identical runs are the determinism proof. One run proves nothing.
+- **It cannot see your UI.** Four adaptations in a row — a CTA rewrite, a variant picker, a
+  provenance mark — each returned a delta of exactly zero. That is the engine having no
+  representation of copy or layout, not your change failing. Do not run an experiment that asks
+  it a question it cannot answer.
+
+### 4. Seal
+
+```bash
+node <skill>/tools/validate-lifecycle.mjs --root . --app <app-id>   # must exit 0
+node tools/seal-app.mjs --app <app-id>
+```
+
+The record goes *inside* the seal. Fix it before sealing, not after.
 
 ---
 
-## Step 2 — Run the lifecycle runner for the first time
+## ⚠ What still requires an engineer
 
-```sh
-node <weave-repo>/packages/weave-tool/skills/weave-application-lifecycle/runner/lifecycle-runner.mjs \
-  --app my-store \
-  --root .
-```
+Each of these has a citation, because "you might need help here" is useless without knowing why.
 
-The runner prints a prompt. That prompt tells you exactly what to do for the
-**intent** stage. Read it. Do the work it describes. Write the proof it asks for.
+1. **Building the app itself.** The lifecycle does not write your application. It gates and records
+   it. Every one of the three sealed examples was built by porting a prepared UI source.
 
----
+2. **Any gate written in bash or Python, on Windows.** `unit_tests_pass` uses shell test syntax and
+   `no_secret_leakage` uses `python3`; on a Windows runner both fail with exit 9009 and advance on
+   operator judgement instead (`video-storefront/proof/engineering-eval-result.json`). Four
+   recurrences and still open. You can disclose the override; you cannot fix it.
+   *(The validator in this package is pure Node specifically so it is not one of these.)*
 
-## Step 3 — Update your state and repeat
+3. **Contrast, in practice.** The QA gate requires the critique, and the critique catches contrast
+   by human judgement. Five contrast defects across the sprint were caught this way and by nothing
+   else. There is no automated check yet — if a design token fails WCAG AA, someone has to notice.
 
-After you complete a stage, open `lifecycle/lifecycle-state.json` and update
-that stage's entry:
+4. **Anything the validator rejects that is a real defect** rather than a bookkeeping slip. A
+   missing proof file you can restore. A schema migration or a broken adapter you cannot — record
+   `engineering_required` with the reason and stop.
 
-```json
-{
-  "stage": "intent",
-  "state": "verified",
-  "eval_result_ref": "proof/intent-eval-result.json",
-  "eval_score_percent": 90
-}
-```
+## When to stop
 
-Then run the runner again. It reads your state and gives you the next prompt.
-Repeat until it prints:
+Two stops, and recording one is a success, not a failure:
 
-```
-ALL STAGES COMPLETE — my-store is ready to seal and close.
-```
+- **`ENGINEERING_REQUIRED`** — set the stage's state to `engineering_required` and write a
+  `reason`. Something needs building that this process cannot build.
+- **`OWNER_GATE`** — set `owner_gate_blocked` with a `reason`. Something needs a decision or an
+  access only the owner holds: deployment, marketing, credentials, spend, publication, or **any
+  change to a frozen contract, seed, or KPI formula**.
 
----
+The validator rejects a stop that names no reason, so you cannot record one uselessly.
 
-## What the stages mean (plain language)
-
-| Stage | You prove |
-|---|---|
-| Intent | The problem is real and worth solving |
-| Research | You know who the users are and what alternatives exist |
-| Selection | You chose the right approach from real options |
-| Plan | There is a concrete plan with acceptance checks |
-| Engineering | The app runs and the tests pass |
-| QA | All promised behaviors are covered |
-| **Deployment** | *(You approve this)* The app goes live |
-| KPI Setup | You can measure whether the app is working |
-| **Marketing** | *(You approve this)* A launch campaign goes out |
-| Iteration | One improvement was made, measured, and decided |
-| Analysis | You know what the app achieved and what to do next |
-
-Stages marked *(You approve this)* pause and wait for you. The runner tells you
-what it needs. Nothing goes live without your explicit action.
+Working around a stop to keep going is the one thing that breaks this process outright. The record
+would then claim a completion that did not happen, and everything downstream inherits the lie.
 
 ---
 
-## Useful tools
+## What you will not get
 
-| Tool | What it does |
-|---|---|
-| `tools/validate.mjs <file>` | Checks a lifecycle-state.json for errors |
-| `tools/seal.mjs --dir <dir>` | Creates a checksum manifest of any directory |
-| `tools/kpi-compare.mjs --baseline <b> --current <c>` | Shows the delta between two KPI snapshots |
-| `tools/generate-events.mjs --seed <n> --count <n>` | Generates deterministic synthetic test events |
-
----
-
-## If something goes wrong
-
-**"lifecycle-state.json not found"** — You ran the runner from the wrong
-directory, or you did not copy the template. Check that `lifecycle/lifecycle-state.json`
-exists relative to where you ran the command.
-
-**"PROOF MISSING"** — The runner found a stage marked `verified` but its
-proof file does not exist on disk. Restore the proof file, or set the stage
-back to `not_started`.
-
-**"OWNER ACTION REQUIRED"** — You have reached a stage that needs your
-approval (deployment or marketing). The runner tells you exactly what to provide.
-Once you have provided it, update the state and run the runner again.
-
-**"ENGINEERING_REQUIRED"** or **"OWNER_GATE"** — The lifecycle hit a wall it
-cannot cross on its own. Read the message. It names what is needed and who
-provides it.
-
----
-
-## Examples
-
-Three completed examples live in:
-```
-packages/weave-tool/skills/weave-application-lifecycle/examples/
-```
-
-Each shows what a finished lifecycle-state.json looks like for a real
-application that went through all 11 stages. Read them to understand what
-"done" looks like before you start.
+- **Any evidence that anyone wants this.** Zero real users have seen any app built this way. A
+  synthetic conversion rate of 13.5% is a property of a seed and a probability table someone wrote
+  by hand. It is not a forecast, and it should never be quoted as one.
+- **A deployed app.** `deployment` and `marketing` have never completed in any run. They need a
+  provider, a processor, and owner approval.
+- **A guarantee the app is good.** The QA gate sets a floor — 7/10, zero P0 — not a ceiling. Before
+  that gate existed, apps scored 91–100% on every stage while an independent review rated them
+  3.6/10.
+- **A cost figure.** No wall-time or token ledger exists for any of the three sealed apps, so
+  whether this is cheaper than hiring an engineer is currently unmeasurable in either direction.
