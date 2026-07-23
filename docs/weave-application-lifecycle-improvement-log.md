@@ -410,3 +410,85 @@ This is the third consecutive cycle (Entry 003 Finding A, Entry 004 Finding B, t
 2. **repo-level .gitignore** — created in this commit; ATM-419 benefits automatically; ATM-423 to confirm nft-storefront and poster-storefront don't stage artifacts
 3. **Cohort elasticity** — three-cycle confirmation; priority ATM-420 candidate
 4. **surface_quality contrast gate (#3)** — `text-ink-faint` failure is the fourth deterministic contrast defect across the sprint; no gate catches it without impeccable
+
+---
+
+## Entry 006 — 2026-07-24 — ATM-419 Vitrine (nft-storefront): chainless boundary as lifecycle gate, 5th contrast defect, 4th cohort-blind cycle
+
+### What was done
+
+Full lifecycle (intent → seal) for `nft-storefront` (Vitrine). Next.js 15 App Router, 8 routes, 6 synthetic editions, Keepsake design system (cream/plum, Nunito), localStorage-only ownership. Absolute chainless boundary: zero wallet/chain/mint/token/RPC in any source, dep, or config. Sealed 50 files @ c4f17460. QA 8.5/10 (34+34/80 Nielsen dual-agent), 0 P0, 1 P1 fixed. Cohort seed=42: CR=10%, AOV=$30.35, refund=0%, no guardrail breach. Iteration: provenance-clarity (edition number prominent on shop cards). validate-contracts PASS — nft-chainless + public-safe-assets (9 checks, 0 warnings).
+
+### Findings
+
+#### Finding A — Chainless negative proof as a first-class lifecycle gate archetype
+
+The nft-storefront is the first app where a lifecycle gate exists purely for *absence* of a feature surface. The `nft-chainless.json` contract enumerates 19 forbidden terms and 7 known_false_positives; `validate-contracts.mjs` runs a grep scan at every engineering gate. This is architecturally distinct from functional contracts (does X exist?) — it is a *prohibition contract* (X must never exist).
+
+This pattern generalises. Any domain with hard-forbidden surfaces (medical advice, financial advice, PII handling, credentials, real payments) can express them as prohibition contracts and integrate them into the lifecycle as hard gates. The current skill has no first-class concept of prohibition contracts. ATM-421 should add one.
+
+**Concrete skill change:** add a `prohibition_contracts` section to the lifecycle plan stage and a `negative_proof_bundle` artifact type (code/dep/config/runtime) to the engineering stage output. The engineering eval-result should include a `negative_proof` field alongside `ac_pass_count`.
+
+#### Finding B — Scanner false-positive resolution: known_false_positives is the correct pattern
+
+Brand nonclaim copy ("Own the edition. Skip the wallet.", "no gas", "not on any chain") triggered the chainless scanner. The resolution was via the pre-existing `known_false_positives` allowlist in `nft-chainless.json`, not by rewording the brand. This is the correct gate pattern:
+
+- Rewording the brand would have violated the spec authority and silently eroded the chainless proof.
+- Fixing the scanner would have been OWNER_GATE (altering frozen negative contracts).
+- The known_false_positives mechanism handles this correctly at zero cost.
+
+The skill should document this resolution path explicitly: "if a scanner FP is encountered, resolve via known_false_positives, not by rewording brand copy or bypassing the scan."
+
+#### Finding C — Muted text contrast (5th deterministic defect in the sprint)
+
+`--ks-muted: oklch(55% 0.015 60)` → rgb(139,119,109) → **3.94:1** against cream background (rgb 251,246,241). Fails WCAG AA for normal text (<18px non-bold, <18.67px bold). Fixed during QA: darkened to `oklch(53% 0.015 60)` → rgb(115,106,99) → **4.92:1**.
+
+This is the fifth contrast defect across the V5 sprint (Entry 001 general, Entry 004 Finding B, Entry 005 Finding D, plus one deferred in sticker-storefront). All five were caught only by impeccable QA — none by build, tests, or contracts.
+
+**Confirms the programmatic contrast gate case is now five-observations strong.** The defect is always the same: a design token set to an OKLCH L% value that looks plausible in isolation but fails against the actual background. A one-line CI script (`node tools/check-contrast.mjs`) over the app's globals.css would catch this mechanically. ATM-423 is the natural point to add this.
+
+**Precise measurement evidence (all via browser JavaScript):**
+- Baseline: `rgb(139,119,109)` on `rgb(251,246,241)` = 3.94:1 (FAIL)
+- Fix: `rgb(115,106,99)` on `rgb(251,246,241)` = 4.92:1 (PASS)
+- Canvas-based oklch→RGB conversion was required because `getComputedStyle` in this browser returns oklch values as-is (not converted to rgb).
+
+#### Finding D — 4th cohort-blind cycle; pattern is now a design constraint
+
+Provenance-clarity adaptation (edition number "no. X" enlarged from 12px/inline to 16px/black on shop cards). Retest seed=42: CR=10%, AOV=$30.35, refund=0%. Delta=0 on all KPIs. This is the fourth consecutive cycle where a UI adaptation produces zero cohort movement.
+
+This is no longer an edge case. The synthetic cohort engine is structurally incapable of detecting UI surface changes in the current implementation. For ATM-420's cross-app comparison and ATM-421's skill spec, this should be stated as a hard constraint, not a warning:
+
+*"The synthetic cohort cannot be used to rank or validate UI adaptations. Its role is limited to: (a) confirming no guardrail breach after an adaptation, and (b) providing a frozen KPI baseline for cross-app comparison. UI adaptation ranking requires real user data or a more sophisticated synthetic model."*
+
+#### Finding E — Inline dual-agent QA worked cleanly; EditionArtwork a11y was pre-solved
+
+Unlike ATM-418 (sub-agents for both Assessment A and B), ATM-419 ran the dual-agent critique inline. The browser accessibility tree inspection (via read_page) was done directly. Key finding: EditionArtwork already had `role="img" aria-label={edition.title + ' — ' + edition.artist}` — the only potential a11y issue I expected was pre-solved in the UI source. The only real finding was the muted contrast (Finding C above). This suggests that when the source code is carefully ported from a reference UI, a11y is largely preserved. The contrast issue was in the token system, not the component structure.
+
+### Scores by stage
+
+| Stage | Score | Gate status |
+|---|---|---|
+| intent | 100% | verified |
+| research | 100% | verified |
+| selection | 100% | verified |
+| plan | 100% | verified |
+| engineering | 100% (12/12 ACs) | build ✓ · contracts ✓ (nft-chainless + public-safe) · golden-path ✓ |
+| qa | 8.5/10 Nielsen | P0=0 ✓ · 1 P1 fixed (muted contrast) |
+| kpi-setup | 100% | freeze ✓ · seed=42 ✓ |
+| iteration | GO (0.0% KPI delta) | provenance-clarity applied · no regression |
+| analysis | 100% | verified |
+
+### What held up well
+
+- Chainless negative proof bundle complete and independently verifiable (code/dep/config/runtime)
+- validate-contracts scanner FP handled correctly via known_false_positives (not brand reword)
+- QA contrast measurement via browser JavaScript canvas (canvas-based oklch→RGB, WCAG math inline)
+- Lifecycle proof chain: 9 eval-result artifacts covering all stages
+- All synthetic-only nonclaims present in every cohort/analysis/iteration artifact
+
+### Open items from this cycle
+
+1. **Prohibition contracts in skill spec** — ATM-421 should add `prohibition_contracts` as a first-class lifecycle artifact type
+2. **Programmatic contrast gate** — fifth defect confirms this; ATM-423 natural insertion point
+3. **Cohort blind spot** — four cycles; ATM-420 cross-app comparison should state this as a hard constraint
+4. **Canvas-based oklch→RGB** — the `getComputedStyle` issue (oklch returned as-is) should be documented in the contrast-check script spec so ATM-423's tooling uses canvas, not computed style
