@@ -28,6 +28,11 @@ states…) tagged for this envelope, so you decide *build / non-claim / owner-ga
 non-goal* for each rather than forgetting one. A recorded "non-goal" is fine; silence is how an
 `intent` promises a refund flow that never ships (LOG Entry 001).
 
+**For deep craft at a stage, see [`craft/`](craft/README.md).** Bundled specialist skills (brand
+ideation & identity, design system, component build, spec writing, i18n, performance, security) mapped
+to the stage each serves. Reference method, not gates — they raise the quality of what you build, not
+the envelope of what it proves.
+
 ## The record is the deliverable
 
 The apps are not the point. **The proof chain is.** A stranger should be able to open
@@ -73,6 +78,10 @@ actually occurred — with its citation. `LOG` = `weave/docs/weave-application-l
 - **Coverage:** walk [`COMMERCE-CHECKLIST.md`](COMMERCE-CHECKLIST.md) and record a decision for every
   domain (build / non-claim / owner-gate / engineer / non-goal). Any behaviour you promise here must
   become a real acceptance criterion at `plan` — the thing that did not happen in `LOG` Entry 001.
+- **Design direction:** name a *distinct* visual direction here, not at build time — the differentiation
+  the pre-wipe "four apps, one face" lacked (`LOG` Entry 001 #9). [`craft/brand-ideation`](craft/README.md)
+  converges half-formed ideas to one; the three `starter-kit/` systems show the bar and the range — they
+  are reference for *what distinct looks like*, not a palette to copy into every app.
 - **Failure mode:** an intent that promises a behaviour the app never ships. `LOG` Entry 001
   records an app whose `intent.md` promised "cancellation and refund" and which shipped no
   reachable refund UI, through a verified `qa`. **Write the journey as steps you can later walk.**
@@ -105,6 +114,8 @@ actually occurred — with its citation. `LOG` = `weave/docs/weave-application-l
   - carry the `COMMERCE-CHECKLIST.md` decisions through: every `[NONCLAIM]` becomes a `non_claims`
     entry, every `[OWNER]`/`[ENG]` becomes a recorded stop. The checklist decides *what*; the plan
     turns each decision into an acceptance criterion, a non-claim, or a stop.
+  - if the intent promises need structuring into checkable ACs, [`craft/pm-spec-writing`](craft/README.md)
+    is the method — every promised behaviour becomes an AC or a recorded stop, nothing is dropped.
 - **Failure mode:** framework-version assumptions. `LOG` Entry 004 Finding C — a plan specified
   Next.js 14 against a UI source using the Next.js 15 async-params API. **Check the actual API
   pattern in the source, do not assume a major version.**
@@ -114,7 +125,9 @@ actually occurred — with its citation. `LOG` = `weave/docs/weave-application-l
 > **How to actually build it — [`starter-kit/`](starter-kit/README.md).** This stage gates the app;
 > it does not tell you how to reach 7/10. The starter kit does: the port-a-prepared-UI-source method,
 > three real design systems, the recurring component inventory, and the QA-readiness checklist. Every
-> sealed app was built by porting a prepared source — start there, not from a blank page.
+> sealed app was built by porting a prepared source — start there, not from a blank page. For the visual
+> system and component method behind it, [`craft/`](craft/README.md) has `design-system`,
+> `design-standards`, `frontend-component-build`, and `brand-identity`.
 
 - **In:** plan.
 - **Out:** working app; `proof/engineering-eval-result.json` with per-AC status and an

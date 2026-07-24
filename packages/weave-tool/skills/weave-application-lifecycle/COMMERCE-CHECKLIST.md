@@ -104,6 +104,7 @@ could, locally. Every `[OWNER]`/`[ENG]` item routes to an existing stop conditio
 - [BUILD] **Public-safe / secret-leakage scan** (already a gate — mind the Windows portability wall, ENVELOPE gap 1)
 - [ENG] Rate-limiting, bot/CAPTCHA on auth & checkout; **webhook signature** verification
 - [ENG] PII encryption at rest/in transit; audit logging; promo-abuse / account-takeover defense
+- *Method:* [`craft/security-baseline`](craft/README.md) — TLS, headers, CSP, secrets, OWASP baseline.
 
 ## K. Accessibility & inclusive UX  *(a legal line now, not a nicety)*
 - [BUILD] **WCAG 2.1/2.2 AA** across storefront, cart, checkout, receipts, support. The **European Accessibility Act is in force (28 Jun 2025)** — WCAG 2.1 AA is legally required for anyone selling to EU consumers.
@@ -117,6 +118,8 @@ could, locally. Every `[OWNER]`/`[ENG]` item routes to an existing stop conditio
 - [ENG] Caching / CDN strategy; handle traffic spikes (launch/sale)
 - [ENG] **Overselling race** under concurrency; **idempotent order creation**
 - [ENG] Third-party resilience (payment/shipping) — retries, timeouts, graceful degradation
+- *Method:* [`craft/performance-optimization`](craft/README.md) — Core Web Vitals, bundle/asset,
+  render perf; [`craft/cost-optimization`](craft/README.md) — infra/SaaS spend, rightsizing (`[OWNER]`).
 
 ## M. Analytics & measurement
 - [BUILD] Event taxonomy: view → add-to-cart → checkout-step → purchase; **funnel & conversion**
@@ -138,6 +141,7 @@ could, locally. Every `[OWNER]`/`[ENG]` item routes to an existing stop conditio
 ## P. Internationalization
 - [BUILD] Locale formatting (currency / date / number / address); RTL readiness
 - [OWNER] Multi-currency pricing; regional tax/duty (DDP/DDU); shipping zones/restrictions; regional payment methods
+- *Method:* [`craft/internationalization`](craft/README.md) — locale strategy, hreflang, translation workflow, RTL.
 
 ## Q. Admin / back-office / operations
 - [BUILD] Product / order / inventory management surfaces (or explicit non-goal)
