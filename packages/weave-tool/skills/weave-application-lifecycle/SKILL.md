@@ -22,6 +22,12 @@ quality; the starter kit is how you reach it — the build method, the three des
 component inventory, and the QA-readiness checklist, all extracted from the sealed apps
 (<https://github.com/harendra-shakya/weave-v5-apps>).
 
+**Before you write intent, walk [`COMMERCE-CHECKLIST.md`](COMMERCE-CHECKLIST.md).** It is the
+coverage layer — every commerce concern (returns, tax, consent, accessibility law, fraud, empty
+states…) tagged for this envelope, so you decide *build / non-claim / owner-gate / engineer /
+non-goal* for each rather than forgetting one. A recorded "non-goal" is fine; silence is how an
+`intent` promises a refund flow that never ships (LOG Entry 001).
+
 ## The record is the deliverable
 
 The apps are not the point. **The proof chain is.** A stranger should be able to open
@@ -64,6 +70,9 @@ actually occurred — with its citation. `LOG` = `weave/docs/weave-application-l
 - **In:** the owner's description of the app and who it is for; explicit constraints.
 - **Out:** `proof/intent-eval-result.json` — goal, target user, success criteria, non-goals.
 - **Hard gate:** the primary user journey is named as a concrete sequence, not an aspiration.
+- **Coverage:** walk [`COMMERCE-CHECKLIST.md`](COMMERCE-CHECKLIST.md) and record a decision for every
+  domain (build / non-claim / owner-gate / engineer / non-goal). Any behaviour you promise here must
+  become a real acceptance criterion at `plan` — the thing that did not happen in `LOG` Entry 001.
 - **Failure mode:** an intent that promises a behaviour the app never ships. `LOG` Entry 001
   records an app whose `intent.md` promised "cancellation and refund" and which shipped no
   reachable refund UI, through a verified `qa`. **Write the journey as steps you can later walk.**
@@ -93,6 +102,9 @@ actually occurred — with its citation. `LOG` = `weave/docs/weave-application-l
   - **the plan predates the engineering it describes.** A plan written afterwards is
     documentation, not a gate. `LOG` Entry 001 records a retrospective plan scoring 93.75%.
   - if the app has forbidden surfaces, declare `prohibition_contracts` here (see below).
+  - carry the `COMMERCE-CHECKLIST.md` decisions through: every `[NONCLAIM]` becomes a `non_claims`
+    entry, every `[OWNER]`/`[ENG]` becomes a recorded stop. The checklist decides *what*; the plan
+    turns each decision into an acceptance criterion, a non-claim, or a stop.
 - **Failure mode:** framework-version assumptions. `LOG` Entry 004 Finding C — a plan specified
   Next.js 14 against a UI source using the Next.js 15 async-params API. **Check the actual API
   pattern in the source, do not assume a major version.**
@@ -116,6 +128,20 @@ actually occurred — with its citation. `LOG` = `weave/docs/weave-application-l
     Entries 001/003/004 and ATM-417 — four recurrences. If a gate cannot execute, record the
     override **in the eval result, with the exact command and exit code**, and disclose it. Do
     not mark it passed.
+- **Score anchors (0–10 — so 7 is a standard, not a vibe):**
+  - **0–3 — ships a defect that defeats the product.** `video-storefront` sold a video and
+    contained no `<video>`; a buy button rendered 1.04:1 (invisible) on every card (`LOG` Entry 001).
+    It compiled and proved nothing real.
+  - **4–6 — runs, but with craft gaps a user hits.** 4 of 5 rarity tiers with no CSS rule so 9 of 10
+    cards render identically; one body-text token deferred at ~2.9:1 in 8 places (Marginalia). Reachable,
+    visibly unfinished.
+  - **7–8 — clears the QA-readiness checklist:** contrast passes AA, every route's empty/error state is
+    built, the golden path walks live. Marginalia (7.25) and OneReel (7.5) sit here.
+  - **9–10 — a distinct, restrained design system carrying a proof no one asked for.** Vitrine's Keepsake
+    (8.5): muted text tuned to AA (4.92:1), a chainless prohibition contract, nothing on screen decorative.
+  - **Do not score the objective dimensions as prose.** Contrast → [`tools/check-contrast.mjs`](tools/check-contrast.mjs);
+    heading order, reachability, named controls → the accessibility-tree pass. Score those from tool output,
+    not opinion — that is the Entry-001 lesson (a confident rubric answer scored 91.67% over a 1.04:1 button).
 - **Escalation:** an unsupported adapter, schema, or stack → `ENGINEERING_REQUIRED`.
 
 ### 6. qa — **the gate that carries the design bar**
@@ -123,9 +149,21 @@ actually occurred — with its citation. `LOG` = `weave/docs/weave-application-l
 - **In:** a running app.
 - **Out:** `proof/qa-eval-result.json` with the critique scores, the finding list with fix status,
   and the non-claims.
+- **Coverage cross-check:** every `[BUILD]` decision from [`COMMERCE-CHECKLIST.md`](COMMERCE-CHECKLIST.md)
+  has a *reachable* surface on the running app — a promised flow that compiles but cannot be walked is
+  the Entry-001 failure and fails qa.
 - **Hard gate — not a suggestion:**
   > **`impeccable` critique ≥ 7/10 and zero P0 findings.**
   > Below either threshold the app returns to engineering. It does not advance.
+- **Score anchors (0–10 — what the number has to mean before you write it down):**
+  - **below 7 — returns to engineering.** A **3** looks like the pre-fix 1.04:1 buy button, or a refund UI
+    the intent promised that no route can reach (`LOG` Entry 001). A **5–6** is a running app still carrying
+    the five accessibility-tree defects Assessment B caught in Marginalia — heading skips, doubled live
+    regions, an unnamed icon-only control (`LOG` Entry 005 A).
+  - **7 — the floor:** AA contrast, every route's empty/error state built, the golden path walks, zero P0.
+    OneReel (7.5) and Marginalia (7.25) cleared it with P1s fixed *inside* qa, not shipped.
+  - **8–10 — dual-agent clean with a differentiator.** Vitrine (8.5): the Keepsake system, a chainless
+    prohibition proof, muted text measured at 4.92:1 rather than eyeballed.
 - **Run it dual-agent** where possible: Assessment A (design/UX, Nielsen heuristics) and
   Assessment B (CLI detector + browser accessibility tree) in parallel. `LOG` Entry 005 Finding A —
   Assessment B's accessibility-tree pass surfaced five real issues that no other gate caught, and

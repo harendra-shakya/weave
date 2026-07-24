@@ -24,6 +24,11 @@ localStorage stores + a synthetic `PaymentForm`), `tailwind.config.ts`, a token 
 `README.md` with a port checklist. See the three under [`docs/atm-415/ui/`](../../../../../docs/atm-415/ui/);
 [`marginalia/README.md`](../../../../../docs/atm-415/ui/marginalia/README.md) is the model.
 
+**Before you port, vet the source.** A port is verbatim, so a contrast or accessibility defect in the
+UI source is one you inherit and pay for at qa. Run [`tools/check-contrast.mjs`](../tools/check-contrast.mjs)
+over the source's token block and an `impeccable` pass over its rendered routes *first* — catching the
+1.04:1 button in the source is cheaper than bouncing it back from qa (`LOG` Entry 001).
+
 The generalized procedure (from the three per-app port checklists):
 
 1. **Pick a direction and freeze its brand rules.** Colours, type, CTA wording, hero copy. Marginalia's
@@ -102,6 +107,10 @@ The two non-trivial domain patterns worth stealing outright:
 The `qa` gate is `impeccable` ≥ 7/10, zero P0. These are the exact defect classes that were caught at
 that gate across the sprint — pre-clear them and you arrive at QA already above the floor instead of
 bouncing back to engineering.
+
+> Complementary doc: [`COMMERCE-CHECKLIST.md`](../COMMERCE-CHECKLIST.md) is the *coverage* layer
+> (**what** a commerce app must handle — walked at intent); this checklist is the *quality* layer
+> (**how** to clear the QA gate on what you built). Use both.
 
 **Contrast (the one that keeps happening — 5 defects, 3 apps, caught *only* by the critique):**
 - [ ] Every text token clears **WCAG AA ≥ 4.5:1** on its background (≥ 3:1 for ≥ 24px/bold).

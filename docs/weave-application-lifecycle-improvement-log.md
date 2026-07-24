@@ -651,3 +651,98 @@ Not applicable — ATM-420 and ATM-421 are analysis and packaging tickets; no ap
 6. **Canonize prohibition contracts as a gated artifact** — `SKILL.md` documents the pattern and the
    plan stage accepts `prohibition_contracts`, but no gate requires one and no schema validates the
    negative proof bundle. Carried from Entry 006 item 1, partially addressed.
+
+---
+
+## Entry 008 — 2026-07-24 — ATM-421: five proposed enhancements evaluated; anchored rubrics + pre-port vet landed; a stranded scoring engine found
+
+### Observation
+
+Five enhancements were proposed for the skill (PRD/TRD docs at intent/plan; run `impeccable` during
+design; a uniform 0–10 per-stage score with auto re-run; anchored 0–10 standards per stage; an
+operator-chosen quality tier). Evaluating them against the current repo surfaced that **three of the
+five re-specify machinery that already exists in this repo but is stranded**, and that only two of the
+five clear the (quality gained ÷ operator burden) bar for a ~10-route local storefront.
+
+### Evidence
+
+- **A complete per-stage scoring engine already exists and is disconnected from the record.**
+  `packages/weave-tool/evals/lifecycle/*.yaml` carry a rubric per stage (0–4 dimensions),
+  `advance_min_score_percent` (80–84), hard gates, and `require_evidence_for_scores: true`.
+  `scripts/weave_eval.py` scores the rubric, compares to the threshold, and in `decide()` returns
+  `revise` → *"revise artifact, then rescore"* below threshold — i.e. **the auto-re-run loop of
+  proposal #3 is already implemented** (`weave_eval.py:498-503`). Two disqualifying facts: it is
+  **Python**, so it sits on the gate-portability wall (`ENVELOPE.md` gap 1, the exact failure that left
+  5 of 6 gates unrun in Entry 001 §1); and the v1 `schema/lifecycle-state.schema.json` carries **no
+  score field** (`additionalProperties: true`) and the pure-Node validator never reads one. The sealed
+  apps' 91.67% / 12-of-12 / 8.5 numbers (defect D5) came from this older Python system, not from the
+  record the validator now governs.
+- **Proposal #4 is already logged as a gap.** Entry 001 Change #8 — "calibrate the rubrics with
+  anti-examples … `advance_min_score_percent: 84` is only meaningful if 84 means something." The yaml
+  rubrics still ask generic questions ("Is the desired outcome specific and testable?",
+  `intent.yaml:33`) with zero anchors.
+- **The D-defects were not doc-format failures.** Entry 001's traceability failure (intent promised
+  refund, no AC forced it) and D1's ordering failure (freeze after baseline) would not have been caught
+  by a PRD/TRD; D1 is already caught by the kpi-setup sequencing gate (`SKILL.md` §8, validator).
+- **`mode: [loop, guided]` still exists** in the schema (`lifecycle-state.schema.json:22`) — proposal
+  #5's premise that the mode concept "was just deleted" is incorrect; it is live, and it is
+  hand-holding level, not the bar height a tier would set.
+- **`to-prd` / `write-spec` skills are not in this repo** (only `implementation-planning`,
+  `primitive-market-research`, etc.), so #1's "just call those" is not a free option here.
+
+### Causal mechanism — why only two of five are worth building now
+
+The burden axis has two buckets: **author burden** (write once) vs **operator burden** (produce/
+understand every run). The skill's premise is a non-engineer operator, so a change that adds author
+burden while *reducing* operator burden wins; one that adds operator burden loses.
+
+- **#4 (anchored standards)** — author-only burden, *reduces* operator burden, already logged, and is
+  the prerequisite that makes #3 and #5 more than false precision (a threshold on an undefined score
+  enforces nothing). Highest ratio.
+- **#2 (impeccable on the source)** — nearly free: every app was port-verbatim, so running the existing
+  `check-contrast.mjs` + an `impeccable` pass against the **UI source before the port** is prevention,
+  not a second gate on the built app.
+- **#3** collapses to *one small Node addition* — a required, validated `score` field on the record —
+  because the re-run loop already exists; 0–10 vs the existing 0–4×4→percent is cosmetic and would only
+  force a rubric migration. Only meaningful after #4.
+- **#1** collapses to *one traceability rule* — "every behaviour promised at intent maps to an AC or
+  plan fails" — the actual Entry-001 fix; the PRD/TRD documents are ceremony at this scale.
+- **#5 (quality tiers)** is gold-plating: it depends on #4, adds operator burden, and collides with
+  `ENVELOPE.md` — a "production" tier cannot promise more than the proven envelope (local Next.js,
+  synthetic cohort, deployment/marketing never completed), so the label would overclaim.
+
+### Change landed this entry
+
+Two, both docs-only, both placed where an operator reads them rather than in the stranded Python system:
+
+1. **#4 — anchored 0–10 score bands in `SKILL.md` `engineering` and `qa`.** Each band is anchored to a
+   real app: a 3 = the 1.04:1 buy button / an unreachable promised refund (Entry 001); 5–6 = the five
+   Assessment-B a11y defects (Entry 005 A); 7 = clears the QA-readiness checklist (OneReel 7.5,
+   Marginalia 7.25); 9–10 = Vitrine's Keepsake (8.5, muted text at 4.92:1). The objective dimensions
+   (contrast, headings, reachability, named controls) are routed to `tools/check-contrast.mjs` and the
+   accessibility-tree pass and **explicitly not scored as prose** — the Entry-001 lesson that a
+   confident rubric answer scored 91.67% over an invisible button.
+2. **#2 — pre-port vet in `starter-kit/README.md`.** Run `check-contrast.mjs` over the source's token
+   block and an `impeccable` pass over its routes *before* porting, because a port is verbatim and a
+   defect in the source is inherited. `SKILL.md`'s engineering stage already points here, so no second
+   edit.
+
+Verification: `node --test tests/negative.test.mjs` → tests 15, pass 15, fail 0; validator behaviour
+against the three sealed apps unchanged (still 2/3/4 errors); links resolve.
+
+### Open items from this cycle
+
+1. **Reconcile or retire the two scoring systems.** The Python eval framework
+   (`scripts/weave_eval.py` + `evals/lifecycle/*.yaml`) and the Node validator both exist and do not
+   talk; the former is on the portability wall and detached from the record the latter governs. This is
+   the real elephant behind proposals #3/#4/#5 and is ATM-422-scale, not a quick add. Decide before
+   building any further scoring.
+2. **#3 (Node half) — a required, validated `score` field** on `stage_entry` in the schema plus a
+   validator check "a `verified` stage below its minimum is an error," on the pure-Node side. Small,
+   portable, closes the remaining half of D5. Do only after #4's anchors give the number meaning.
+3. **#1 (traceability gate)** — "every intent-promised behaviour maps to an acceptance criterion or
+   plan fails." The genuine Entry-001 fix, distinct from the PRD/TRD documents, which are not being
+   built.
+4. Carried unchanged from Entry 007: digest from `cohort-runner.mjs` (D8); inherited Python/bash gate
+   portability; cost ledger; `ENGINEERING_REQUIRED`/`OWNER_GATE` in a real run (ATM-422); canonize
+   prohibition contracts as a gated artifact.

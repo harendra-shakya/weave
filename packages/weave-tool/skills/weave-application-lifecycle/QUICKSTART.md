@@ -52,6 +52,11 @@ record that quietly says something untrue.
 `SKILL.md` has the full reference — inputs, outputs, gates, and the failure mode that has actually
 occurred at each stage. The short version:
 
+**Before the intent row, walk [`COMMERCE-CHECKLIST.md`](COMMERCE-CHECKLIST.md)** — every commerce
+concern (returns, tax, consent, accessibility law, empty states…) with a decision to make on each:
+build it, declare a non-claim, or record an owner/engineer stop. It is the "did I forget anything"
+list; a recorded "not doing this" is a fine answer, a forgotten concern is not.
+
 | Stage | You produce | It advances when |
 |---|---|---|
 | intent | goal, target user, success criteria, non-goals | the user journey is written as steps you could walk |
