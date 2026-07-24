@@ -13,7 +13,11 @@ get" at the end — it is the most useful section here.
 ## What you need
 
 - Node 20+ and a terminal.
-- A repo with the `contracts/`, `tools/` and `apps/` layout — `weave-v5-apps` is the reference.
+- A repo with the `contracts/`, `tools/` and `apps/` layout. **Clone the reference:**
+  `git clone https://github.com/harendra-shakya/weave-v5-apps` — it has the `cohort-runner.mjs` and
+  `seal-app.mjs` you will run in steps 3–4 and the frozen `contracts/`. Work inside it, or copy its
+  `tools/` and `contracts/` into your own repo before step 3 (this skill package ships only the
+  validator; the runner and sealer live in that repo).
 - A description of the app: what it sells, who buys it, what "working" means.
 - **An engineer available for the steps marked ⚠ below.** There are four. Nobody has yet run this
   end to end without one; ATM-422 is the ticket that tests whether that is possible.
@@ -98,7 +102,10 @@ The record goes *inside* the seal. Fix it before sealing, not after.
 Each of these has a citation, because "you might need help here" is useless without knowing why.
 
 1. **Building the app itself.** The lifecycle does not write your application. It gates and records
-   it. Every one of the three sealed examples was built by porting a prepared UI source.
+   it. Every one of the three sealed examples was built by porting a prepared UI source —
+   **[`starter-kit/`](starter-kit/README.md) is how you do that**: the port method, three real design
+   systems you can copy, the component inventory, and the checklist that clears the QA gate. It gets
+   you to the sealed apps' starting craft; it does not get you past the real payment/data seams below.
 
 2. **Any gate written in bash or Python, on Windows.** `unit_tests_pass` uses shell test syntax and
    `no_secret_leakage` uses `python3`; on a Windows runner both fail with exit 9009 and advance on
@@ -106,9 +113,11 @@ Each of these has a citation, because "you might need help here" is useless with
    recurrences and still open. You can disclose the override; you cannot fix it.
    *(The validator in this package is pure Node specifically so it is not one of these.)*
 
-3. **Contrast, in practice.** The QA gate requires the critique, and the critique catches contrast
-   by human judgement. Five contrast defects across the sprint were caught this way and by nothing
-   else. There is no automated check yet — if a design token fails WCAG AA, someone has to notice.
+3. **Contrast, in practice.** Five contrast defects across the sprint were caught only by human
+   judgement in the critique. There is now a check for the token-level case:
+   `node tools/check-contrast.mjs --tokens <sheet.css> --pairs <pairs.json>` fails closed below WCAG
+   AA (see [`starter-kit/`](starter-kit/README.md) §QA-readiness). Run it — but it only sees declared
+   token pairs, so contrast produced at runtime (text over images/gradients) still needs a human eye.
 
 4. **Anything the validator rejects that is a real defect** rather than a bookkeeping slip. A
    missing proof file you can restore. A schema migration or a broken adapter you cannot — record

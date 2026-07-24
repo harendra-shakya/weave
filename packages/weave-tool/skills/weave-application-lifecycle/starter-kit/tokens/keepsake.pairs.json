@@ -1,0 +1,12 @@
+{
+  "_note": "Worked example: the text/background pairs Keepsake (Vitrine) actually uses. Run: node ../../tools/check-contrast.mjs --tokens keepsake.css --pairs keepsake.pairs.json",
+  "aa_normal": 4.5,
+  "aa_large": 3.0,
+  "checks": [
+    { "fg": "--ks-ink",    "bg": "--ks-cream",  "label": "primary text on cream",        "size": "normal" },
+    { "fg": "--ks-mid",    "bg": "--ks-cream",  "label": "secondary text on cream",      "size": "normal" },
+    { "fg": "--ks-muted",  "bg": "--ks-cream",  "label": "muted body on cream (AA-tuned)", "size": "normal" },
+    { "fg": "--ks-accent", "bg": "--ks-cream",  "label": "plum accent (CTAs/marks/headings — large only; 3.87:1 would FAIL as body text)", "size": "large" },
+    { "fg": "--ks-ink",    "bg": "--ks-paper",  "label": "primary text on paper",        "size": "normal" }
+  ]
+}

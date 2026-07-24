@@ -35,8 +35,8 @@ Three applications completed the lifecycle and sealed. All numbers below are on 
 | sticker-storefront (Marginalia) | ATM-418 | `86766633`, 53 files | 12 routes, QA Nielsen 29/40 = 7.25/10, 0 P0; cohort seed 42 → CR 13.5%, AOV $12.85; two reproducing runs |
 | nft-storefront (Vitrine) | ATM-419 | `c4f17460`, 50 files | 8 routes, QA dual-agent 8.5/10, 0 P0; cohort seed 42 → CR 10.0%, AOV $30.35; two reproducing runs; chainless prohibition proof |
 
-Paths: `weave-v5-apps/apps/<app>/proof/seal-manifest.json` and
-`weave-v5-apps/apps/<app>/lifecycle/lifecycle-state.json`.
+Apps repo: <https://github.com/harendra-shakya/weave-v5-apps>. Paths:
+`apps/<app>/proof/seal-manifest.json` and `apps/<app>/lifecycle/lifecycle-state.json`.
 Full cross-app analysis: `weave/docs/atm-415/atm-420-cross-app-comparison.md`.
 
 All three ran: frozen baseline → one bounded adaptation → identical-seed retest → verdict.
@@ -102,11 +102,15 @@ This is a **hard gate, not a suggestion.** An app below 7/10, or with any P0 ope
 advance — it returns to engineering. Across the three sealed apps the gate held: all three
 cleared it, and 5 P1s plus 2 P2s were fixed *inside* QA rather than shipped.
 
-The residual: **contrast is still checked by human judgement.** Five deterministic contrast
-defects across this sprint were caught only by the critique — never by build, tests, or contracts
-(Entries 001, 004 Finding B, 005 Finding D, 006 Finding C, plus one still deferred in
-sticker-storefront at ~2.9:1). Contrast is scriptable and is not yet scripted. If you write that
-checker, use canvas-based oklch→RGB conversion: `getComputedStyle` returns oklch values as-is.
+The residual, now narrowed: **contrast used to be checked by human judgement only.** Five
+deterministic contrast defects across this sprint were caught only by the critique — never by build,
+tests, or contracts (Entries 001, 004 Finding B, 005 Finding D, 006 Finding C, plus one still
+deferred in sticker-storefront at ~2.9:1). That class is now scriptable *and scripted*:
+`tools/check-contrast.mjs` computes WCAG ratios over a token sheet (hex / RGB-channel / oklch, pure
+Node) and fails closed below AA. It cross-checks against reality — it computes Vitrine's `--ks-muted`
+at 4.92:1, the value that app sealed at. **What remains open:** it must be *run* against a declared
+pairs manifest; it is not yet wired as an auto-blocking gate in the app repo, and it cannot see
+contrast produced at runtime (gradients, images, overlaid text) — only declared token pairs.
 
 ### Gap 3 — The cohort blind spot *(four cycles; treat as a hard constraint)*
 

@@ -3,14 +3,14 @@
 Three apps completed this lifecycle and sealed under ATM-415. They are **linked, not duplicated** —
 the artifacts live in the apps repo and are the authority. Each illustrates something different.
 
-Root: `P:\Development\Projects\weave-v5-apps\apps\`
+Repo: <https://github.com/harendra-shakya/weave-v5-apps> (`apps/<app>/`)
 Cross-app analysis: `weave/docs/atm-415/atm-420-cross-app-comparison.md`
 
 | App | Ticket | Seal | Illustrates |
 |---|---|---|---|
-| [video-storefront](../../../../../weave-v5-apps/apps/video-storefront) | ATM-417 | `164785a4`, 61 files | the gate-portability wall, in the record |
-| [sticker-storefront](../../../../../weave-v5-apps/apps/sticker-storefront) | ATM-418 | `86766633`, 53 files | dual-agent QA, and a verdict rule not applied |
-| [nft-storefront](../../../../../weave-v5-apps/apps/nft-storefront) | ATM-419 | `c4f17460`, 50 files | the prohibition contract as a lifecycle gate |
+| [video-storefront](https://github.com/harendra-shakya/weave-v5-apps/tree/main/apps/video-storefront) | ATM-417 | `164785a4`, 61 files | the gate-portability wall, in the record |
+| [sticker-storefront](https://github.com/harendra-shakya/weave-v5-apps/tree/main/apps/sticker-storefront) | ATM-418 | `86766633`, 53 files | dual-agent QA, and a verdict rule not applied |
+| [nft-storefront](https://github.com/harendra-shakya/weave-v5-apps/tree/main/apps/nft-storefront) | ATM-419 | `c4f17460`, 50 files | the prohibition contract as a lifecycle gate |
 
 ---
 

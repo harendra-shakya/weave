@@ -17,6 +17,11 @@ description: Drive a small local commerce app from first idea to a sealed, audit
 skill is *proven* (local Next.js storefronts, three sealed examples) versus where it is merely
 *designed to work*, and the four gaps you will meet inside the proven boundary.
 
+**To build the app itself, read [`starter-kit/`](starter-kit/README.md).** This document gates
+quality; the starter kit is how you reach it — the build method, the three design systems, the
+component inventory, and the QA-readiness checklist, all extracted from the sealed apps
+(<https://github.com/harendra-shakya/weave-v5-apps>).
+
 ## The record is the deliverable
 
 The apps are not the point. **The proof chain is.** A stranger should be able to open
@@ -94,6 +99,11 @@ actually occurred — with its citation. `LOG` = `weave/docs/weave-application-l
 
 ### 5. engineering
 
+> **How to actually build it — [`starter-kit/`](starter-kit/README.md).** This stage gates the app;
+> it does not tell you how to reach 7/10. The starter kit does: the port-a-prepared-UI-source method,
+> three real design systems, the recurring component inventory, and the QA-readiness checklist. Every
+> sealed app was built by porting a prepared source — start there, not from a blank page.
+
 - **In:** plan.
 - **Out:** working app; `proof/engineering-eval-result.json` with per-AC status and an
   intervention count; `INTERVENTION_LEDGER.md` updated.
@@ -123,8 +133,9 @@ actually occurred — with its citation. `LOG` = `weave/docs/weave-application-l
   degraded banner** (`LOG` Entry 004 Finding A).
 - **Failure mode — the one that keeps happening:** **contrast.** Five deterministic contrast
   defects across the sprint, every one caught here and nowhere else (`LOG` Entries 001, 004 B,
-  005 D, 006 C). Measure it, do not eyeball it — and if you script it, convert oklch→RGB through
-  a canvas: `getComputedStyle` returns oklch values as-is (`LOG` Entry 006 Finding C).
+  005 D, 006 C). Measure it, do not eyeball it: run [`tools/check-contrast.mjs`](tools/check-contrast.mjs)
+  over your token sheet with a pairs manifest (see [`starter-kit/`](starter-kit/README.md) §QA-readiness) —
+  it fails closed below AA and handles hex / RGB-channel / oklch in pure Node.
 
 ### 7. deployment — **owner-gated**
 
@@ -287,8 +298,10 @@ Do not downgrade a stop to a warning to keep the loop moving.
 ## Validation
 
 ```bash
-# from this repo, against an app repo elsewhere — the cross-repo case is the point
-node tools/validate-lifecycle.mjs --root ../../../../weave-v5-apps --app nft-storefront
+# from this repo, against an app repo elsewhere — the cross-repo case is the point.
+# fill in the real path to your apps repo (a clone of github.com/harendra-shakya/weave-v5-apps);
+# it is a sibling of this repo, not nested inside it, so a relative path needs the right depth.
+node tools/validate-lifecycle.mjs --root <path-to-weave-v5-apps> --app nft-storefront
 
 # a bare state file, for fixtures
 node tools/validate-lifecycle.mjs --state path/to/lifecycle-state.json

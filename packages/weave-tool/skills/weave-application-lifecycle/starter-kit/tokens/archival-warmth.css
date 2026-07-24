@@ -1,0 +1,50 @@
+/* ============================================================
+   Archival Warmth — OneReel (video-storefront, ATM-417)
+   Extracted verbatim from apps/video-storefront/styles/tokens.css.
+   Signature: ONE accent (ember) used sparingly; editorial serif titles;
+   hairline borders; restrained radii; LIGHT MODE ONLY (the cream is the identity).
+   Type: Newsreader (serif titles) + Source Sans 3 (UI), loaded via next/font.
+   ============================================================ */
+:root {
+  color-scheme: light only;
+
+  /* --- Color --- */
+  --or-cream: #F7F1E6;        /* page base — warm off-white */
+  --or-paper: #FDFAF3;        /* raised surfaces: cards, inputs */
+  --or-cream-deep: #EFE6D3;   /* recessed panels, notices */
+  --or-ink: #211D15;          /* primary text — warm near-black */
+  --or-ink-soft: #6B6350;     /* secondary text (≥4.5:1 on cream) */
+  --or-ember: #A8431A;        /* THE single accent: CTAs, maker's name, active states */
+  --or-ember-deep: #8A3512;   /* ember hover / pressed */
+  --or-ember-wash: #F1E0CE;   /* faint ember tint for highlight panels */
+  --or-line: #E2D8C3;         /* hairline borders */
+  --or-line-strong: #CBBFA4;
+  --or-success: #4A6741;      /* confirmation only */
+  --or-danger: #9C3A2E;       /* form errors only */
+
+  /* --- Type --- */
+  --or-font-serif: "Newsreader", Georgia, "Times New Roman", serif;
+  --or-font-sans: "Source Sans 3", "Segoe UI", system-ui, sans-serif;
+
+  --or-display: clamp(2.75rem, 6vw, 4.5rem);
+  --or-title-lg: clamp(2rem, 3.5vw, 2.75rem);
+  --or-title: 2rem;
+  --or-title-sm: 1.5rem;
+
+  /* --- Layout --- */
+  --or-measure: 38rem;        /* comfortable reading width */
+  --or-page: 72rem;           /* page container */
+
+  /* --- Radii (restrained — archival, not bubbly) --- */
+  --or-radius-xs: 2px;
+  --or-radius-sm: 3px;
+  --or-radius-md: 6px;
+}
+
+/* Base treatment (from app/globals.css @layer base) */
+@layer base {
+  body { @apply bg-or-cream font-sans text-or-ink antialiased; }
+  ::selection { background: var(--or-ember-wash); }
+  a { @apply underline-offset-4; }               /* accent stays sparing — ember on interaction only */
+  :focus-visible { outline: 2px solid var(--or-ember); outline-offset: 2px; }
+}

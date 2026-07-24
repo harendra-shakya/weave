@@ -1,0 +1,37 @@
+/* ---------------------------------------------------------------
+   Keepsake — Vitrine (nft-storefront, ATM-419)
+   Extracted verbatim from apps/nft-storefront/app/globals.css.
+   Signature: quiet cream/sand neutrals + a single plum accent; numbered-edition
+   marks; restraint over decoration. Highest QA score of the three (8.5/10).
+   Tokens are space-separated RGB channels (Tailwind alpha support).
+   Type: Nunito, loaded via next/font.
+
+   TEACHING NOTE — the contrast lesson is baked into --ks-muted below.
+   It was deliberately tuned to oklch(53%) so muted text clears WCAG AA (≥4.5:1)
+   on cream. Contrast is the sprint's most-recurrent defect (5 across 3 apps);
+   this token is what "getting it right" looks like. See STARTER-KIT.md §QA-readiness.
+   --------------------------------------------------------------- */
+:root {
+  --ks-cream:       251 246 241;   /* #fbf6f1 — page base */
+  --ks-paper:       253 251 247;   /* #fdfbf7 — raised surfaces */
+  --ks-warm:        246 237 228;   /* #f6ede4 */
+  --ks-sand:        241 229 218;   /* #f1e5da */
+  --ks-sand-deep:   227 212 199;   /* #e3d4c7 — borders */
+  --ks-ink:          74  63  58;   /* #4a3f3a — primary text */
+  --ks-mid:         107  90  82;   /* #6b5a52 — secondary text */
+  --ks-muted:       115 106  99;   /* #736a63 — oklch(53%), tuned to clear WCAG AA on cream */
+  --ks-faint:       182 163 152;   /* #b6a398 — decorative only, NOT body text */
+  --ks-accent:      138 111 184;   /* #8a6fb8 — plum, the single accent */
+  --ks-accent-deep:  111  87 152;  /* #6f5798 — accent hover/pressed */
+  --ks-accent-soft:  239 230 248;  /* #efe6f8 — faint accent tint */
+}
+
+* { box-sizing: border-box; }
+
+body {
+  background-color: rgb(var(--ks-cream));
+  color: rgb(var(--ks-ink));
+  -webkit-font-smoothing: antialiased;
+}
+
+a { color: inherit; }

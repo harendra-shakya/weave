@@ -1,0 +1,53 @@
+/* ---------------------------------------------------------------
+   Vinyl Pop — Marginalia (sticker-storefront, ATM-418)
+   Extracted verbatim from apps/sticker-storefront/app/globals.css.
+   Signature: glossy candy — purple ground, cream die-cut cards, hard offset
+   shadows (.text-pop), springy pills, badge-tilt. LIGHT MODE ONLY.
+   Tokens are space-separated RGB channels so Tailwind alpha (bg-cream/30) works.
+   Type: Baloo 2 → --font-sans, loaded via next/font in app/layout.tsx.
+   --------------------------------------------------------------- */
+:root {
+  /* ground + surfaces */
+  --color-purple: 124 77 212;       /* page background */
+  --color-purple-deep: 74 33 160;   /* hard offset shadows, headings on cream */
+  --color-cream: 255 246 234;       /* card surface */
+  --color-cream-bright: 255 253 248;/* inputs, recessed panels */
+  --color-line: 237 224 203;        /* borders on cream */
+
+  /* text */
+  --color-lavender: 227 212 255;    /* body text on purple */
+  --color-lavender-deep: 201 179 240;
+  --color-soft: 110 90 147;         /* secondary text on cream */
+  --color-faint: 156 139 190;       /* metadata on cream */
+
+  /* candy accents */
+  --color-pink: 255 93 143;
+  --color-pink-deep: 194 58 102;
+  --color-mint: 55 200 139;
+  --color-mint-deep: 31 138 92;
+  --color-sun: 255 201 51;
+  --color-sun-deep: 199 147 16;
+
+  /* placeholder-artwork palette (sticker art only, never UI chrome) */
+  --color-art-blue: 92 168 255;
+  --color-art-orange: 255 138 80;
+
+  /* shape */
+  --radius-card: 24px;
+  --radius-control: 14px;
+}
+
+@layer base {
+  body { @apply bg-purple font-sans text-ink antialiased; }
+  a { @apply font-bold text-mint-deep underline-offset-4 hover:text-ink hover:underline; }
+  :focus-visible { @apply outline-none ring-[3px] ring-sun ring-offset-2 ring-offset-purple; }
+  ::selection { @apply bg-sun text-ink; }
+}
+
+@layer utilities {
+  .text-pop {                        /* chunky headline on the purple ground */
+    color: rgb(var(--color-cream));
+    text-shadow: 4px 4px 0 rgb(var(--color-purple-deep));
+  }
+  .badge-tilt { transform: rotate(-2deg); }
+}
